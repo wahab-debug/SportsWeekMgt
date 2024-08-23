@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="28672e8fb80d4f2c9d1ccfeb9b257d19" Name="Diagram1">
+        <EntityTypeShape EntityType="SportsWeekDBModel.Fixture" Width="1.5" PointX="9.75" PointY="2.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekDBModel.SessionEvent" Width="1.5" PointX="5.25" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekDBModel.Session" Width="1.5" PointX="0.75" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekDBModel.SessionSportsWeek" Width="1.5" PointX="3" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekDBModel.Sport" Width="1.5" PointX="3" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekDBModel.Team" Width="1.5" PointX="7.5" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekDBModel.TeamMember" Width="1.5" PointX="9.75" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekDBModel.User" Width="1.5" PointX="0.75" PointY="6.75" IsExpanded="true" />
+        <AssociationConnector Association="SportsWeekDBModel.FK__Fixtures__team1___5BE2A6F2" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekDBModel.FK__Fixtures__team2___5CD6CB2B" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekDBModel.FK__SessionEv__sessi__52593CB8" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekDBModel.FK__SessionEv__sport__534D60F1" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekDBModel.FK__Team__SessionEve__5629CD9C" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekDBModel.FK__SessionSp__sessi__4F7CD00D" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekDBModel.FK__TeamMembe__team___59063A47" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
