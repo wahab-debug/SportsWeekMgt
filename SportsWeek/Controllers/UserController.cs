@@ -33,9 +33,39 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
             }
         }
+        [HttpGet]
+        public HttpResponseMessage getById(string id) {
+            try
+            {
+                // Fetch the user with the given id from the database
+                var user = db.Users
+                    .Where(u => u.registration_no == id)
+                    .Select(u => new
+                    {
+                        u.name,
+                        u.registration_no,
+                        u.password,
+                        u.role
+                    })
+                    .FirstOrDefault();
 
+                if (user == null)
+                {
+                    // If no user is found, return a NotFound response
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "User not found");
+                }
+
+                // Return the user details
+                return Request.CreateResponse(HttpStatusCode.OK, user);
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions and return an InternalServerError response
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
         [HttpPost]
-
+        
         public HttpResponseMessage PostUser(User user)
         {
             try
