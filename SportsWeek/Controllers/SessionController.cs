@@ -19,12 +19,24 @@ namespace SportsWeek.Controllers
                 var list = db.Sessions.Select(s => new 
                 {
                     s.name,
-                    s.start,
-                    s.end,
-                }).OrderByDescending(s =>s.start).ToList();
+                    s.start_date,
+                    s.end_date,
+                }).OrderByDescending(s =>s.start_date).ToList();
                 return Request.CreateResponse(HttpStatusCode.OK,list);
             }
             catch(Exception ex) 
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        [HttpGet]
+        public HttpResponseMessage currentSession() {
+            try
+            {
+                var list = db.Sessions.OrderByDescending(s => s.end_date).Select(s=>s.name).FirstOrDefault();
+                return Request.CreateResponse(HttpStatusCode.OK, list);
+            }
+            catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }

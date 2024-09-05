@@ -25,13 +25,11 @@ namespace SportsWeek.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Fixture> Fixtures { get; set; }
-        public virtual DbSet<SessionEvent> SessionEvents { get; set; }
         public virtual DbSet<Session> Sessions { get; set; }
-        public virtual DbSet<SessionSportsWeek> SessionSportsWeeks { get; set; }
+        public virtual DbSet<SessionSport> SessionSports { get; set; }
         public virtual DbSet<Sport> Sports { get; set; }
-        public virtual DbSet<Team> Teams { get; set; }
-        public virtual DbSet<TeamMember> TeamMembers { get; set; }
+        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Rule> Rules { get; set; }
     }
 }

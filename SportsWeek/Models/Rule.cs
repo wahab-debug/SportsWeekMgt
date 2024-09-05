@@ -12,14 +12,11 @@ namespace SportsWeek.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class Fixture
+    public partial class Rule
     {
-        public int id { get; set; }
-        public Nullable<int> team1_id { get; set; }
-        public Nullable<int> team2_id { get; set; }
-        public Nullable<System.DateTime> date { get; set; }
+        public int sport_id { get; set; }
+        public string rule_of_game { get; set; }
     
-        public virtual Team Team { get; set; }
-        public virtual Team Team1 { get; set; }
+        public virtual Sport Sport { get; set; }
     }
 }

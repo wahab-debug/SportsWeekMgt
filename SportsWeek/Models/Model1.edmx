@@ -5,206 +5,137 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
       <Schema Namespace="SportsWeekDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Fixtures">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="int" Nullable="false" />
-          <Property Name="team1_id" Type="int" />
-          <Property Name="team2_id" Type="int" />
-          <Property Name="date" Type="date" />
-        </EntityType>
         <!--Errors Found During Generation:
-warning 6013: The table/view 'SportsWeekDB.dbo.FixturesImages' does not have a primary key defined and no valid primary key could be inferred. This table/view has been excluded. To use the entity, you will need to review your schema, add the correct keys, and uncomment it.
-        <EntityType Name="FixturesImages">
-          <Property Name="image" Type="nvarchar" MaxLength="500" />
-          <Property Name="fixtures_id" Type="int" />
-        </EntityType>-->
-        <EntityType Name="SessionEvents">
+warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="Rules">
           <Key>
-            <PropertyRef Name="id" />
+            <PropertyRef Name="sport_id" />
           </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="sessionSportsWeek_id" Type="int" />
-          <Property Name="sports_id" Type="int" />
+          <Property Name="sport_id" Type="int" Nullable="false" />
+          <Property Name="rule_of_game" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="Sessions">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="name" Type="nvarchar" MaxLength="500" />
-          <Property Name="start" Type="date" />
-          <Property Name="end" Type="date" />
+          <Property Name="name" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="start_date" Type="date" />
+          <Property Name="end_date" Type="date" />
         </EntityType>
-        <EntityType Name="SessionSportsWeek">
+        <EntityType Name="SessionSports">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="start_date" Type="date" />
-          <Property Name="end_date" Type="date" />
-          <Property Name="sessions_id" Type="int" />
+          <Property Name="session_id" Type="int" />
+          <Property Name="sports_id" Type="int" />
+          <Property Name="managed_by" Type="int" />
+          <Property Name="no_of_teams" Type="int" />
         </EntityType>
         <EntityType Name="Sports">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="sessionid" Type="int" />
-          <Property Name="game" Type="nvarchar" MaxLength="500" />
+          <Property Name="game" Type="varchar" MaxLength="30" />
+          <Property Name="game_type" Type="varchar" MaxLength="30" />
         </EntityType>
-        <EntityType Name="Team">
+        <EntityType Name="sysdiagrams">
           <Key>
-            <PropertyRef Name="id" />
+            <PropertyRef Name="diagram_id" />
           </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="name" Type="varchar" MaxLength="500" />
-          <Property Name="SessionEvent_id" Type="int" />
-        </EntityType>
-        <EntityType Name="TeamMembers">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="name" Type="varchar" MaxLength="500" />
-          <Property Name="reg_number" Type="int" />
-          <Property Name="role" Type="varchar" MaxLength="50" />
-          <Property Name="team_id" Type="int" />
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="name" Type="nvarchar" MaxLength="500" />
-          <Property Name="registration_no" Type="varchar" MaxLength="100" />
-          <Property Name="password" Type="nvarchar" MaxLength="500" />
-          <Property Name="role" Type="varchar" MaxLength="25" />
+          <Property Name="name" Type="varchar" MaxLength="100" />
+          <Property Name="registration_no" Type="varchar" MaxLength="30" />
+          <Property Name="password" Type="varchar" MaxLength="100" />
+          <Property Name="role" Type="varchar" MaxLength="20" />
         </EntityType>
-        <Association Name="FK__Fixtures__team1___5BE2A6F2">
-          <End Role="Team" Type="Self.Team" Multiplicity="0..1" />
-          <End Role="Fixtures" Type="Self.Fixtures" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Team">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Fixtures">
-              <PropertyRef Name="team1_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Fixtures__team2___5CD6CB2B">
-          <End Role="Team" Type="Self.Team" Multiplicity="0..1" />
-          <End Role="Fixtures" Type="Self.Fixtures" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Team">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Fixtures">
-              <PropertyRef Name="team2_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <!--Errors Found During Generation:
-error 6004: The table 'SportsWeekDB.dbo.FixturesImages' is referenced by a relationship, but cannot be found.
-        <Association Name="FK__FixturesI__fixtu__5EBF139D" />-->
-        <Association Name="FK__SessionEv__sessi__52593CB8">
-          <End Role="SessionSportsWeek" Type="Self.SessionSportsWeek" Multiplicity="0..1" />
-          <End Role="SessionEvents" Type="Self.SessionEvents" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="SessionSportsWeek">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="SessionEvents">
-              <PropertyRef Name="sessionSportsWeek_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__SessionEv__sport__534D60F1">
-          <End Role="Sports" Type="Self.Sports" Multiplicity="0..1" />
-          <End Role="SessionEvents" Type="Self.SessionEvents" Multiplicity="*" />
+        <Association Name="FK_Rules_Sports">
+          <End Role="Sports" Type="Self.Sports" Multiplicity="1" />
+          <End Role="Rules" Type="Self.Rules" Multiplicity="0..1" />
           <ReferentialConstraint>
             <Principal Role="Sports">
               <PropertyRef Name="id" />
             </Principal>
-            <Dependent Role="SessionEvents">
-              <PropertyRef Name="sports_id" />
+            <Dependent Role="Rules">
+              <PropertyRef Name="sport_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__SessionSp__sessi__4F7CD00D">
+        <Association Name="FK_SessionSports_Sessions">
           <End Role="Sessions" Type="Self.Sessions" Multiplicity="0..1" />
-          <End Role="SessionSportsWeek" Type="Self.SessionSportsWeek" Multiplicity="*" />
+          <End Role="SessionSports" Type="Self.SessionSports" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Sessions">
               <PropertyRef Name="id" />
             </Principal>
-            <Dependent Role="SessionSportsWeek">
-              <PropertyRef Name="sessions_id" />
+            <Dependent Role="SessionSports">
+              <PropertyRef Name="session_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Team__SessionEve__5629CD9C">
-          <End Role="SessionEvents" Type="Self.SessionEvents" Multiplicity="0..1" />
-          <End Role="Team" Type="Self.Team" Multiplicity="*" />
+        <Association Name="FK_SessionSports_Sports">
+          <End Role="Sports" Type="Self.Sports" Multiplicity="0..1" />
+          <End Role="SessionSports" Type="Self.SessionSports" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="SessionEvents">
+            <Principal Role="Sports">
               <PropertyRef Name="id" />
             </Principal>
-            <Dependent Role="Team">
-              <PropertyRef Name="SessionEvent_id" />
+            <Dependent Role="SessionSports">
+              <PropertyRef Name="sports_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__TeamMembe__team___59063A47">
-          <End Role="Team" Type="Self.Team" Multiplicity="0..1" />
-          <End Role="TeamMembers" Type="Self.TeamMembers" Multiplicity="*" />
+        <Association Name="FK_SessionSports_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="SessionSports" Type="Self.SessionSports" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Team">
+            <Principal Role="Users">
               <PropertyRef Name="id" />
             </Principal>
-            <Dependent Role="TeamMembers">
-              <PropertyRef Name="team_id" />
+            <Dependent Role="SessionSports">
+              <PropertyRef Name="managed_by" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="SportsWeekDBModelStoreContainer">
-          <EntitySet Name="Fixtures" EntityType="Self.Fixtures" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="SessionEvents" EntityType="Self.SessionEvents" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sessions" EntityType="Self.Sessions" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="SessionSportsWeek" EntityType="Self.SessionSportsWeek" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SessionSports" EntityType="Self.SessionSports" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sports" EntityType="Self.Sports" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Team" EntityType="Self.Team" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="TeamMembers" EntityType="Self.TeamMembers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__Fixtures__team1___5BE2A6F2" Association="Self.FK__Fixtures__team1___5BE2A6F2">
-            <End Role="Team" EntitySet="Team" />
-            <End Role="Fixtures" EntitySet="Fixtures" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Fixtures__team2___5CD6CB2B" Association="Self.FK__Fixtures__team2___5CD6CB2B">
-            <End Role="Team" EntitySet="Team" />
-            <End Role="Fixtures" EntitySet="Fixtures" />
-          </AssociationSet>
-          <AssociationSet Name="FK__SessionEv__sessi__52593CB8" Association="Self.FK__SessionEv__sessi__52593CB8">
-            <End Role="SessionSportsWeek" EntitySet="SessionSportsWeek" />
-            <End Role="SessionEvents" EntitySet="SessionEvents" />
-          </AssociationSet>
-          <AssociationSet Name="FK__SessionEv__sport__534D60F1" Association="Self.FK__SessionEv__sport__534D60F1">
+          <EntitySet Name="Rules" EntityType="Self.Rules" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [Rules].[sport_id] AS [sport_id], 
+    [Rules].[rule_of_game] AS [rule_of_game]
+    FROM [dbo].[Rules] AS [Rules]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="FK_Rules_Sports" Association="Self.FK_Rules_Sports">
             <End Role="Sports" EntitySet="Sports" />
-            <End Role="SessionEvents" EntitySet="SessionEvents" />
+            <End Role="Rules" EntitySet="Rules" />
           </AssociationSet>
-          <AssociationSet Name="FK__SessionSp__sessi__4F7CD00D" Association="Self.FK__SessionSp__sessi__4F7CD00D">
+          <AssociationSet Name="FK_SessionSports_Sessions" Association="Self.FK_SessionSports_Sessions">
             <End Role="Sessions" EntitySet="Sessions" />
-            <End Role="SessionSportsWeek" EntitySet="SessionSportsWeek" />
+            <End Role="SessionSports" EntitySet="SessionSports" />
           </AssociationSet>
-          <AssociationSet Name="FK__Team__SessionEve__5629CD9C" Association="Self.FK__Team__SessionEve__5629CD9C">
-            <End Role="SessionEvents" EntitySet="SessionEvents" />
-            <End Role="Team" EntitySet="Team" />
+          <AssociationSet Name="FK_SessionSports_Sports" Association="Self.FK_SessionSports_Sports">
+            <End Role="Sports" EntitySet="Sports" />
+            <End Role="SessionSports" EntitySet="SessionSports" />
           </AssociationSet>
-          <AssociationSet Name="FK__TeamMembe__team___59063A47" Association="Self.FK__TeamMembe__team___59063A47">
-            <End Role="Team" EntitySet="Team" />
-            <End Role="TeamMembers" EntitySet="TeamMembers" />
+          <AssociationSet Name="FK_SessionSports_Users" Association="Self.FK_SessionSports_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="SessionSports" EntitySet="SessionSports" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -212,211 +143,138 @@ error 6004: The table 'SportsWeekDB.dbo.FixturesImages' is referenced by a relat
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="SportsWeekDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="Fixture">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
-          <Property Name="team1_id" Type="Int32" />
-          <Property Name="team2_id" Type="Int32" />
-          <Property Name="date" Type="DateTime" Precision="0" />
-          <NavigationProperty Name="Team" Relationship="Self.FK__Fixtures__team1___5BE2A6F2" FromRole="Fixtures" ToRole="Team" />
-          <NavigationProperty Name="Team1" Relationship="Self.FK__Fixtures__team2___5CD6CB2B" FromRole="Fixtures" ToRole="Team" />
-        </EntityType>
-        <EntityType Name="SessionEvent">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="sessionSportsWeek_id" Type="Int32" />
-          <Property Name="sports_id" Type="Int32" />
-          <NavigationProperty Name="SessionSportsWeek" Relationship="Self.FK__SessionEv__sessi__52593CB8" FromRole="SessionEvents" ToRole="SessionSportsWeek" />
-          <NavigationProperty Name="Sport" Relationship="Self.FK__SessionEv__sport__534D60F1" FromRole="SessionEvents" ToRole="Sports" />
-          <NavigationProperty Name="Teams" Relationship="Self.FK__Team__SessionEve__5629CD9C" FromRole="SessionEvents" ToRole="Team" />
-        </EntityType>
         <EntityType Name="Session">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="start" Type="DateTime" Precision="0" />
-          <Property Name="end" Type="DateTime" Precision="0" />
-          <NavigationProperty Name="SessionSportsWeeks" Relationship="Self.FK__SessionSp__sessi__4F7CD00D" FromRole="Sessions" ToRole="SessionSportsWeek" />
+          <Property Name="name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="start_date" Type="DateTime" Precision="0" />
+          <Property Name="end_date" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="SessionSports" Relationship="Self.FK_SessionSports_Sessions" FromRole="Sessions" ToRole="SessionSports" />
         </EntityType>
-        <EntityType Name="SessionSportsWeek">
+        <EntityType Name="SessionSport">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="start_date" Type="DateTime" Precision="0" />
-          <Property Name="end_date" Type="DateTime" Precision="0" />
-          <Property Name="sessions_id" Type="Int32" />
-          <NavigationProperty Name="SessionEvents" Relationship="Self.FK__SessionEv__sessi__52593CB8" FromRole="SessionSportsWeek" ToRole="SessionEvents" />
-          <NavigationProperty Name="Session" Relationship="Self.FK__SessionSp__sessi__4F7CD00D" FromRole="SessionSportsWeek" ToRole="Sessions" />
+          <Property Name="session_id" Type="Int32" />
+          <Property Name="sports_id" Type="Int32" />
+          <Property Name="managed_by" Type="Int32" />
+          <Property Name="no_of_teams" Type="Int32" />
+          <NavigationProperty Name="Session" Relationship="Self.FK_SessionSports_Sessions" FromRole="SessionSports" ToRole="Sessions" />
+          <NavigationProperty Name="Sport" Relationship="Self.FK_SessionSports_Sports" FromRole="SessionSports" ToRole="Sports" />
+          <NavigationProperty Name="User" Relationship="Self.FK_SessionSports_Users" FromRole="SessionSports" ToRole="Users" />
         </EntityType>
         <EntityType Name="Sport">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="sessionid" Type="Int32" />
-          <Property Name="game" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="SessionEvents" Relationship="Self.FK__SessionEv__sport__534D60F1" FromRole="Sports" ToRole="SessionEvents" />
+          <Property Name="game" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="game_type" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="SessionSports" Relationship="Self.FK_SessionSports_Sports" FromRole="Sports" ToRole="SessionSports" />
+          <NavigationProperty Name="Rule" Relationship="Self.FK_Rules_Sports" FromRole="Sports" ToRole="Rules" />
         </EntityType>
-        <EntityType Name="Team">
+        <EntityType Name="sysdiagram">
           <Key>
-            <PropertyRef Name="id" />
+            <PropertyRef Name="diagram_id" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="name" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="SessionEvent_id" Type="Int32" />
-          <NavigationProperty Name="Fixtures" Relationship="Self.FK__Fixtures__team1___5BE2A6F2" FromRole="Team" ToRole="Fixtures" />
-          <NavigationProperty Name="Fixtures1" Relationship="Self.FK__Fixtures__team2___5CD6CB2B" FromRole="Team" ToRole="Fixtures" />
-          <NavigationProperty Name="SessionEvent" Relationship="Self.FK__Team__SessionEve__5629CD9C" FromRole="Team" ToRole="SessionEvents" />
-          <NavigationProperty Name="TeamMembers" Relationship="Self.FK__TeamMembe__team___59063A47" FromRole="Team" ToRole="TeamMembers" />
-        </EntityType>
-        <EntityType Name="TeamMember">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="name" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="reg_number" Type="Int32" />
-          <Property Name="role" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="team_id" Type="Int32" />
-          <NavigationProperty Name="Team" Relationship="Self.FK__TeamMembe__team___59063A47" FromRole="TeamMembers" ToRole="Team" />
+          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
         </EntityType>
         <EntityType Name="User">
           <Key>
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="name" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="registration_no" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="password" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="role" Type="String" MaxLength="25" FixedLength="false" Unicode="false" />
+          <Property Name="name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="registration_no" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="role" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="SessionSports" Relationship="Self.FK_SessionSports_Users" FromRole="Users" ToRole="SessionSports" />
         </EntityType>
-        <Association Name="FK__Fixtures__team1___5BE2A6F2">
-          <End Role="Team" Type="Self.Team" Multiplicity="0..1" />
-          <End Role="Fixtures" Type="Self.Fixture" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Team">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Fixtures">
-              <PropertyRef Name="team1_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Fixtures__team2___5CD6CB2B">
-          <End Role="Team" Type="Self.Team" Multiplicity="0..1" />
-          <End Role="Fixtures" Type="Self.Fixture" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Team">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Fixtures">
-              <PropertyRef Name="team2_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__SessionEv__sessi__52593CB8">
-          <End Role="SessionSportsWeek" Type="Self.SessionSportsWeek" Multiplicity="0..1" />
-          <End Role="SessionEvents" Type="Self.SessionEvent" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="SessionSportsWeek">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="SessionEvents">
-              <PropertyRef Name="sessionSportsWeek_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__SessionEv__sport__534D60F1">
-          <End Role="Sports" Type="Self.Sport" Multiplicity="0..1" />
-          <End Role="SessionEvents" Type="Self.SessionEvent" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Sports">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="SessionEvents">
-              <PropertyRef Name="sports_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Team__SessionEve__5629CD9C">
-          <End Role="SessionEvents" Type="Self.SessionEvent" Multiplicity="0..1" />
-          <End Role="Team" Type="Self.Team" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="SessionEvents">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Team">
-              <PropertyRef Name="SessionEvent_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__SessionSp__sessi__4F7CD00D">
+        <EntityType Name="Rule">
+          <Key>
+            <PropertyRef Name="sport_id" />
+          </Key>
+          <Property Name="sport_id" Type="Int32" Nullable="false" />
+          <Property Name="rule_of_game" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Sport" Relationship="Self.FK_Rules_Sports" FromRole="Rules" ToRole="Sports" />
+        </EntityType>
+        <Association Name="FK_SessionSports_Sessions">
           <End Role="Sessions" Type="Self.Session" Multiplicity="0..1" />
-          <End Role="SessionSportsWeek" Type="Self.SessionSportsWeek" Multiplicity="*" />
+          <End Role="SessionSports" Type="Self.SessionSport" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Sessions">
               <PropertyRef Name="id" />
             </Principal>
-            <Dependent Role="SessionSportsWeek">
-              <PropertyRef Name="sessions_id" />
+            <Dependent Role="SessionSports">
+              <PropertyRef Name="session_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__TeamMembe__team___59063A47">
-          <End Role="Team" Type="Self.Team" Multiplicity="0..1" />
-          <End Role="TeamMembers" Type="Self.TeamMember" Multiplicity="*" />
+        <Association Name="FK_SessionSports_Sports">
+          <End Role="Sports" Type="Self.Sport" Multiplicity="0..1" />
+          <End Role="SessionSports" Type="Self.SessionSport" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Team">
+            <Principal Role="Sports">
               <PropertyRef Name="id" />
             </Principal>
-            <Dependent Role="TeamMembers">
-              <PropertyRef Name="team_id" />
+            <Dependent Role="SessionSports">
+              <PropertyRef Name="sports_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SessionSports_Users">
+          <End Role="Users" Type="Self.User" Multiplicity="0..1" />
+          <End Role="SessionSports" Type="Self.SessionSport" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="SessionSports">
+              <PropertyRef Name="managed_by" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Rules_Sports">
+          <End Role="Sports" Type="Self.Sport" Multiplicity="1" />
+          <End Role="Rules" Type="Self.Rule" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Sports">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Rules">
+              <PropertyRef Name="sport_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="SportsWeekDBEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Fixtures" EntityType="Self.Fixture" />
-          <EntitySet Name="SessionEvents" EntityType="Self.SessionEvent" />
           <EntitySet Name="Sessions" EntityType="Self.Session" />
-          <EntitySet Name="SessionSportsWeeks" EntityType="Self.SessionSportsWeek" />
+          <EntitySet Name="SessionSports" EntityType="Self.SessionSport" />
           <EntitySet Name="Sports" EntityType="Self.Sport" />
-          <EntitySet Name="Teams" EntityType="Self.Team" />
-          <EntitySet Name="TeamMembers" EntityType="Self.TeamMember" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
           <EntitySet Name="Users" EntityType="Self.User" />
-          <AssociationSet Name="FK__Fixtures__team1___5BE2A6F2" Association="Self.FK__Fixtures__team1___5BE2A6F2">
-            <End Role="Team" EntitySet="Teams" />
-            <End Role="Fixtures" EntitySet="Fixtures" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Fixtures__team2___5CD6CB2B" Association="Self.FK__Fixtures__team2___5CD6CB2B">
-            <End Role="Team" EntitySet="Teams" />
-            <End Role="Fixtures" EntitySet="Fixtures" />
-          </AssociationSet>
-          <AssociationSet Name="FK__SessionEv__sessi__52593CB8" Association="Self.FK__SessionEv__sessi__52593CB8">
-            <End Role="SessionSportsWeek" EntitySet="SessionSportsWeeks" />
-            <End Role="SessionEvents" EntitySet="SessionEvents" />
-          </AssociationSet>
-          <AssociationSet Name="FK__SessionEv__sport__534D60F1" Association="Self.FK__SessionEv__sport__534D60F1">
-            <End Role="Sports" EntitySet="Sports" />
-            <End Role="SessionEvents" EntitySet="SessionEvents" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Team__SessionEve__5629CD9C" Association="Self.FK__Team__SessionEve__5629CD9C">
-            <End Role="SessionEvents" EntitySet="SessionEvents" />
-            <End Role="Team" EntitySet="Teams" />
-          </AssociationSet>
-          <AssociationSet Name="FK__SessionSp__sessi__4F7CD00D" Association="Self.FK__SessionSp__sessi__4F7CD00D">
+          <EntitySet Name="Rules" EntityType="Self.Rule" />
+          <AssociationSet Name="FK_SessionSports_Sessions" Association="Self.FK_SessionSports_Sessions">
             <End Role="Sessions" EntitySet="Sessions" />
-            <End Role="SessionSportsWeek" EntitySet="SessionSportsWeeks" />
+            <End Role="SessionSports" EntitySet="SessionSports" />
           </AssociationSet>
-          <AssociationSet Name="FK__TeamMembe__team___59063A47" Association="Self.FK__TeamMembe__team___59063A47">
-            <End Role="Team" EntitySet="Teams" />
-            <End Role="TeamMembers" EntitySet="TeamMembers" />
+          <AssociationSet Name="FK_SessionSports_Sports" Association="Self.FK_SessionSports_Sports">
+            <End Role="Sports" EntitySet="Sports" />
+            <End Role="SessionSports" EntitySet="SessionSports" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SessionSports_Users" Association="Self.FK_SessionSports_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="SessionSports" EntitySet="SessionSports" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Rules_Sports" Association="Self.FK_Rules_Sports">
+            <End Role="Sports" EntitySet="Sports" />
+            <End Role="Rules" EntitySet="Rules" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -425,42 +283,24 @@ error 6004: The table 'SportsWeekDB.dbo.FixturesImages' is referenced by a relat
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="SportsWeekDBModelStoreContainer" CdmEntityContainer="SportsWeekDBEntities">
-          <EntitySetMapping Name="Fixtures">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.Fixture">
-              <MappingFragment StoreEntitySet="Fixtures">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="team1_id" ColumnName="team1_id" />
-                <ScalarProperty Name="team2_id" ColumnName="team2_id" />
-                <ScalarProperty Name="date" ColumnName="date" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="SessionEvents">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.SessionEvent">
-              <MappingFragment StoreEntitySet="SessionEvents">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="sessionSportsWeek_id" ColumnName="sessionSportsWeek_id" />
-                <ScalarProperty Name="sports_id" ColumnName="sports_id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="Sessions">
             <EntityTypeMapping TypeName="SportsWeekDBModel.Session">
               <MappingFragment StoreEntitySet="Sessions">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="start" ColumnName="start" />
-                <ScalarProperty Name="end" ColumnName="end" />
+                <ScalarProperty Name="start_date" ColumnName="start_date" />
+                <ScalarProperty Name="end_date" ColumnName="end_date" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="SessionSportsWeeks">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.SessionSportsWeek">
-              <MappingFragment StoreEntitySet="SessionSportsWeek">
+          <EntitySetMapping Name="SessionSports">
+            <EntityTypeMapping TypeName="SportsWeekDBModel.SessionSport">
+              <MappingFragment StoreEntitySet="SessionSports">
                 <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="start_date" ColumnName="start_date" />
-                <ScalarProperty Name="end_date" ColumnName="end_date" />
-                <ScalarProperty Name="sessions_id" ColumnName="sessions_id" />
+                <ScalarProperty Name="session_id" ColumnName="session_id" />
+                <ScalarProperty Name="sports_id" ColumnName="sports_id" />
+                <ScalarProperty Name="managed_by" ColumnName="managed_by" />
+                <ScalarProperty Name="no_of_teams" ColumnName="no_of_teams" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -468,28 +308,19 @@ error 6004: The table 'SportsWeekDB.dbo.FixturesImages' is referenced by a relat
             <EntityTypeMapping TypeName="SportsWeekDBModel.Sport">
               <MappingFragment StoreEntitySet="Sports">
                 <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="sessionid" ColumnName="sessionid" />
                 <ScalarProperty Name="game" ColumnName="game" />
+                <ScalarProperty Name="game_type" ColumnName="game_type" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Teams">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.Team">
-              <MappingFragment StoreEntitySet="Team">
-                <ScalarProperty Name="id" ColumnName="id" />
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="SportsWeekDBModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
                 <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="SessionEvent_id" ColumnName="SessionEvent_id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="TeamMembers">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.TeamMember">
-              <MappingFragment StoreEntitySet="TeamMembers">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="reg_number" ColumnName="reg_number" />
-                <ScalarProperty Name="role" ColumnName="role" />
-                <ScalarProperty Name="team_id" ColumnName="team_id" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -501,6 +332,14 @@ error 6004: The table 'SportsWeekDB.dbo.FixturesImages' is referenced by a relat
                 <ScalarProperty Name="registration_no" ColumnName="registration_no" />
                 <ScalarProperty Name="password" ColumnName="password" />
                 <ScalarProperty Name="role" ColumnName="role" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Rules">
+            <EntityTypeMapping TypeName="SportsWeekDBModel.Rule">
+              <MappingFragment StoreEntitySet="Rules">
+                <ScalarProperty Name="sport_id" ColumnName="sport_id" />
+                <ScalarProperty Name="rule_of_game" ColumnName="rule_of_game" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

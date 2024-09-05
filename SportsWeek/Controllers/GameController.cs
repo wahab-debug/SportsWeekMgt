@@ -16,13 +16,18 @@ namespace SportsWeek.Controllers
         public HttpResponseMessage gameBySession() {
             try
             {
-                var latestSession = db.Sessions.OrderByDescending(s => s.end).FirstOrDefault();
-                var list = db.Sports.Where(sp=> sp.sessionid==latestSession.id).
+                var sessiongame = db.SessionSports.Select(s => new 
+                {
+                    s.Sport,
+                    s.Session
+                }).ToList();
+                /*var latestSession = db.Sessions.OrderByDescending(s => s.end_date).FirstOrDefault();
+                var list = db.Sports.Where(sp=> sp.id==latestSession.id).
                     Select(s => new
                 {
                     s.game
-                }).ToList();
-                return Request.CreateResponse(HttpStatusCode.OK, list);
+                }).ToList();*/
+                return Request.CreateResponse(HttpStatusCode.OK, sessiongame);
             }
             catch (Exception ex)
             {
@@ -34,14 +39,14 @@ namespace SportsWeek.Controllers
         public HttpResponseMessage gameAdd(List<Sport> games) {
             try
             {
-                var latestSession = db.Sessions.OrderByDescending(s => s.end).FirstOrDefault();
+                var latestSession = db.Sessions.OrderByDescending(s => s.end_date).FirstOrDefault();
                 if (latestSession == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound, "No session found");
                 }
                 foreach (var g in games)
                 {
-                    g.sessionid = latestSession.id;
+                    g.id = latestSession.id;
                     db.Sports.Add(g);
                 }
                 db.SaveChanges();

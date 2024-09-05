@@ -17,14 +17,14 @@ namespace SportsWeek.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Sport()
         {
-            this.SessionEvents = new HashSet<SessionEvent>();
+            this.SessionSports = new HashSet<SessionSport>();
         }
     
         public int id { get; set; }
-        public Nullable<int> sessionid { get; set; }
         public string game { get; set; }
+        public string game_type { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SessionEvent> SessionEvents { get; set; }
+        public virtual ICollection<SessionSport> SessionSports { get; set; }
     }
 }
