@@ -13,10 +13,10 @@ namespace SportsWeek.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class SportsWeekDBEntities : DbContext
+    public partial class SportsWeekdbEntities : DbContext
     {
-        public SportsWeekDBEntities()
-            : base("name=SportsWeekDBEntities")
+        public SportsWeekdbEntities()
+            : base("name=SportsWeekdbEntities")
         {
         }
     

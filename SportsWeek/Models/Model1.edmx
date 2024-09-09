@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="SportsWeekDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="SportsWeekdbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <!--Errors Found During Generation:
 warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="Rules">
@@ -109,7 +109,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="SportsWeekDBModelStoreContainer">
+        <EntityContainer Name="SportsWeekdbModelStoreContainer">
           <EntitySet Name="Sessions" EntityType="Self.Sessions" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SessionSports" EntityType="Self.SessionSports" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sports" EntityType="Self.Sports" Schema="dbo" store:Type="Tables" />
@@ -142,7 +142,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
     </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="SportsWeekDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+      <Schema Namespace="SportsWeekdbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityType Name="Session">
           <Key>
             <PropertyRef Name="id" />
@@ -253,7 +253,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="SportsWeekDBEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="SportsWeekdbEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Sessions" EntityType="Self.Session" />
           <EntitySet Name="SessionSports" EntityType="Self.SessionSport" />
           <EntitySet Name="Sports" EntityType="Self.Sport" />
@@ -282,9 +282,9 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="SportsWeekDBModelStoreContainer" CdmEntityContainer="SportsWeekDBEntities">
+        <EntityContainerMapping StorageEntityContainer="SportsWeekdbModelStoreContainer" CdmEntityContainer="SportsWeekdbEntities">
           <EntitySetMapping Name="Sessions">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.Session">
+            <EntityTypeMapping TypeName="SportsWeekdbModel.Session">
               <MappingFragment StoreEntitySet="Sessions">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="name" ColumnName="name" />
@@ -294,7 +294,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="SessionSports">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.SessionSport">
+            <EntityTypeMapping TypeName="SportsWeekdbModel.SessionSport">
               <MappingFragment StoreEntitySet="SessionSports">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="session_id" ColumnName="session_id" />
@@ -305,7 +305,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Sports">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.Sport">
+            <EntityTypeMapping TypeName="SportsWeekdbModel.Sport">
               <MappingFragment StoreEntitySet="Sports">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="game" ColumnName="game" />
@@ -314,7 +314,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="sysdiagrams">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.sysdiagram">
+            <EntityTypeMapping TypeName="SportsWeekdbModel.sysdiagram">
               <MappingFragment StoreEntitySet="sysdiagrams">
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="principal_id" ColumnName="principal_id" />
@@ -325,7 +325,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Users">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.User">
+            <EntityTypeMapping TypeName="SportsWeekdbModel.User">
               <MappingFragment StoreEntitySet="Users">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="name" ColumnName="name" />
@@ -336,7 +336,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Rules">
-            <EntityTypeMapping TypeName="SportsWeekDBModel.Rule">
+            <EntityTypeMapping TypeName="SportsWeekdbModel.Rule">
               <MappingFragment StoreEntitySet="Rules">
                 <ScalarProperty Name="sport_id" ColumnName="sport_id" />
                 <ScalarProperty Name="rule_of_game" ColumnName="rule_of_game" />

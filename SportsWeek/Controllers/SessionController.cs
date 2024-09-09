@@ -10,7 +10,7 @@ namespace SportsWeek.Controllers
 {
     public class SessionController : ApiController
     {
-        SportsWeekDBEntities db = new SportsWeekDBEntities();
+        SportsWeekdbEntities db = new SportsWeekdbEntities();
         [HttpGet]
         public HttpResponseMessage sessionList() 
         {

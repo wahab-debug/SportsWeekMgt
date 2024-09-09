@@ -4,15 +4,17 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="5eba1a4b01804056bc78b8366f207e60" Name="Diagram1">
-        <EntityTypeShape EntityType="SportsWeekdbModel.Session" Width="1.5" PointX="0.75" PointY="1.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="SportsWeekdbModel.SessionSport" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
-        <EntityTypeShape EntityType="SportsWeekdbModel.Sport" Width="1.5" PointX="0.75" PointY="4.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SportsWeekdbModel.sysdiagram" Width="1.5" PointX="2.75" PointY="4.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SportsWeekdbModel.User" Width="1.5" PointX="0.75" PointY="7.25" IsExpanded="true" />
+      <Diagram DiagramId="5ceaaf39168e4308855eaac979923b1d" Name="Diagram1">
+        <EntityTypeShape EntityType="SportsWeekdbModel.Session" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.SessionSport" Width="1.5" PointX="3" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.Sport" Width="1.5" PointX="0.75" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.sysdiagram" Width="1.5" PointX="5.75" PointY="2.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.User" Width="1.5" PointX="0.75" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.Rule" Width="1.5" PointX="3" PointY="7.75" IsExpanded="true" />
         <AssociationConnector Association="SportsWeekdbModel.FK_SessionSports_Sessions" ManuallyRouted="false" />
         <AssociationConnector Association="SportsWeekdbModel.FK_SessionSports_Sports" ManuallyRouted="false" />
         <AssociationConnector Association="SportsWeekdbModel.FK_SessionSports_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_Rules_Sports" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

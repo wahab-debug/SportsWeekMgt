@@ -26,5 +26,6 @@ namespace SportsWeek.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<SessionSport> SessionSports { get; set; }
+        public virtual Rule Rule { get; set; }
     }
 }
