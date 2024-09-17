@@ -41,7 +41,7 @@ namespace SportsWeek.Controllers
         public HttpResponseMessage getAllgames() {
             try
             {
-                var games = db.Sports.Select(s => s.game).ToList();
+                var games = db.Sports.Select(s => new { s.game, s.id } ).ToList();
                 return Request.CreateResponse(HttpStatusCode.OK, games);
             }
             catch (Exception ex)
@@ -63,19 +63,26 @@ namespace SportsWeek.Controllers
             }
         }
         [HttpPost]
-        public HttpResponseMessage gameAddToLatestSession(List<Sport> games) {
+        public HttpResponseMessage gameAddToLatestSession(SessionSport game) {
             try
             {
                 var latestSession = db.Sessions.OrderByDescending(s => s.end_date).FirstOrDefault();
+                var existingGame = db.SessionSports.FirstOrDefault(gs => gs.sports_id == game.sports_id && gs.managed_by == game.managed_by);
+                var uniqueGameperSession = db.SessionSports.FirstOrDefault(gs => gs.sports_id == game.sports_id && gs.session_id == latestSession.id);
                 if (latestSession == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound, "No session found");
                 }
-                foreach (var g in games)
+                if (existingGame != null && game.session_id==latestSession.id) 
                 {
-                    g.id = latestSession.id;
-                    db.Sports.Add(g);
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
                 }
+                if (uniqueGameperSession!=null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest);
+                }
+                game.session_id = latestSession.id;
+                db.SessionSports.Add(game);                
                 db.SaveChanges();
                 return Request.CreateResponse(HttpStatusCode.OK, "Game list is added");
             }

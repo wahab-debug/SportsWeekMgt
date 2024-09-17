@@ -21,6 +21,7 @@ namespace SportsWeek.Controllers
                 var list = db.Users
                     .Select(u => new
                     {
+                        u.id,
                         u.name,
                         u.registration_no,
                         u.password,
