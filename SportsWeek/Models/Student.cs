@@ -12,24 +12,21 @@ namespace SportsWeek.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class User
+    public partial class Student
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public User()
+        public Student()
         {
-            this.SessionSports = new HashSet<SessionSport>();
-            this.Teams = new HashSet<Team>();
+            this.Players = new HashSet<Player>();
         }
     
-        public int id { get; set; }
+        public string reg_no { get; set; }
         public string name { get; set; }
-        public string registration_no { get; set; }
-        public string password { get; set; }
-        public string role { get; set; }
+        public string discipline { get; set; }
+        public Nullable<int> semeno { get; set; }
+        public string section { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<SessionSport> SessionSports { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Team> Teams { get; set; }
+        public virtual ICollection<Player> Players { get; set; }
     }
 }

@@ -23,6 +23,7 @@ namespace SportsWeek.Controllers
                             where ss.start_date==latestSession.start_date
                             select new
                             {
+                                s.id,
                                 s.game,
                                 s.game_type,
                                 ss.name,
@@ -53,6 +54,11 @@ namespace SportsWeek.Controllers
         public HttpResponseMessage addGame(Sport game) {
             try
             {
+                var existingGame = db.Sports.FirstOrDefault(s => s.game == game.game);
+                if (existingGame != null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Conflict);
+                }
                db.Sports.Add(game);
                db.SaveChanges();
                return Request.CreateResponse(HttpStatusCode.OK, "Game list is added");
@@ -63,7 +69,8 @@ namespace SportsWeek.Controllers
             }
         }
         [HttpPost]
-        public HttpResponseMessage gameAddToLatestSession(SessionSport game) {
+        public HttpResponseMessage gameAddToLatestSession(SessionSport game) 
+        {
             try
             {
                 var latestSession = db.Sessions.OrderByDescending(s => s.end_date).FirstOrDefault();
@@ -90,6 +97,6 @@ namespace SportsWeek.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-            } 
+        } 
     }
 }

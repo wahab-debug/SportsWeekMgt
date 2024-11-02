@@ -13,7 +13,6 @@ namespace SportsWeek.Controllers
         SportsWeekdbEntities db = new SportsWeekdbEntities();
 
         [HttpGet]
-
         public HttpResponseMessage UserList()
         {
             try
@@ -43,6 +42,7 @@ namespace SportsWeek.Controllers
                     .Where(u => u.registration_no == id)
                     .Select(u => new
                     {
+                        u.id,
                         u.name,
                         u.registration_no,
                         u.password,
@@ -66,11 +66,15 @@ namespace SportsWeek.Controllers
             }
         }
         [HttpPost]
-        
         public HttpResponseMessage PostUser(User user)
         {
             try
             {
+                var existingUser = db.Users.FirstOrDefault(u => u.registration_no == user.registration_no);
+                if (existingUser != null) 
+                {
+                    return Request.CreateResponse(HttpStatusCode.Conflict);
+                }
                 var result = db.Users.Add(user);
                 db.SaveChanges();
                 return Request.CreateResponse(HttpStatusCode.OK, "added");
@@ -81,33 +85,75 @@ namespace SportsWeek.Controllers
 
             }
         }
-
         [HttpPost]
-        public HttpResponseMessage LoginStd(User t)
+        public HttpResponseMessage updateUser(string id,User user)
         {
-            var user = db.Users.FirstOrDefault(u => u.registration_no == t.registration_no);
             try
             {
-                if (user == null)
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, "Null user not found");
+                var result = db.Users.FirstOrDefault(u => u.registration_no == id);
+                if (result == null) {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
                 }
-                if (user.password == t.password)
-                {
-                    return Request.CreateResponse(HttpStatusCode.OK, "Success");
-                }
-                else
-                {
-                    return Request.CreateResponse(HttpStatusCode.Unauthorized, "Wrong password");
-                }
+                result.name = user.name;
+                result.role = user.role;
+                result.registration_no = user.registration_no;
+                
+                db.SaveChanges();
+                return Request.CreateResponse(HttpStatusCode.OK, "updated");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
 
             }
+        }
+        [HttpDelete]
+        public HttpResponseMessage deleteUser(string id)
+        {
+            try
+            {
+                var user = db.Users.FirstOrDefault(u => u.registration_no == id);
 
+                if (user == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "User not found");
+                }
+
+                db.Users.Remove(user);
+                db.SaveChanges();
+
+                return Request.CreateResponse(HttpStatusCode.OK, "User deleted successfully");
+            }
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-
         }
+
+        [HttpGet]
+        public HttpResponseMessage getEventManagers() 
+        {
+            try
+            {
+                var latestSession = db.Sessions.OrderByDescending(s => s.end_date).FirstOrDefault();
+                var eventmanagers = from User in db.Users
+                                    join SessionSport in db.SessionSports on User.id equals SessionSport.managed_by
+                                    join sport in db.Sports on SessionSport.sports_id equals sport.id
+                                    where User.role == "Mod" && SessionSport.session_id == latestSession.id
+                                    select new 
+                                    {
+                                      User.name, 
+                                      User.registration_no, 
+                                      Sport = sport.game 
+                                    };
+                return Request.CreateResponse(HttpStatusCode.OK, eventmanagers);
+
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
     }
 }

@@ -4,17 +4,45 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="5ceaaf39168e4308855eaac979923b1d" Name="Diagram1">
-        <EntityTypeShape EntityType="SportsWeekdbModel.Session" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="SportsWeekdbModel.SessionSport" Width="1.5" PointX="3" PointY="3.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="SportsWeekdbModel.Sport" Width="1.5" PointX="0.75" PointY="4.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="SportsWeekdbModel.sysdiagram" Width="1.5" PointX="5.75" PointY="2.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="SportsWeekdbModel.User" Width="1.5" PointX="0.75" PointY="7.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="SportsWeekdbModel.Rule" Width="1.5" PointX="3" PointY="7.75" IsExpanded="true" />
+      <Diagram DiagramId="509b2812badd47059da0ffad55dd2d3f" Name="Diagram1">
+        <EntityTypeShape EntityType="SportsWeekdbModel.Comment" Width="1.5" PointX="10.5" PointY="15.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.CricketScore" Width="1.5" PointX="10.5" PointY="11.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.Fixture" Width="1.5" PointX="8.25" PointY="16.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.FixturesImage" Width="1.5" PointX="10.5" PointY="18.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.GoalBaseScore" Width="1.5" PointX="13.5" PointY="14.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.Player" Width="1.5" PointX="8.25" PointY="12.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.PointsBaseScore" Width="1.5" PointX="13.5" PointY="17.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.Session" Width="1.5" PointX="0.75" PointY="9.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.SessionSport" Width="1.5" PointX="3" PointY="13.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.Sport" Width="1.5" PointX="0.75" PointY="13.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.Student" Width="1.5" PointX="6" PointY="8.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.sysdiagram" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.Team" Width="1.5" PointX="6" PointY="12.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.TurnBaseGame" Width="1.5" PointX="13.5" PointY="11.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.User" Width="1.5" PointX="0.75" PointY="16.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="SportsWeekdbModel.Rule" Width="1.5" PointX="3" PointY="22.5" IsExpanded="true" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_Comments_Fixtures" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_CricketScore_Fixtures" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_CricketScore_Teams" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_Fixtures_Teams" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_Fixtures_Teams1" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_FixturesImages_Fixtures" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_GoalBaseScore_Fixtures" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_PointsBaseScore_Fixtures" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_TurnBaseGames_Fixtures" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_GoalBaseScore_Teams" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_Player_Student" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_Player_Teams" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_PointsBaseScore_Teams" ManuallyRouted="false" />
         <AssociationConnector Association="SportsWeekdbModel.FK_SessionSports_Sessions" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_Teams_Sessions" ManuallyRouted="false" />
         <AssociationConnector Association="SportsWeekdbModel.FK_SessionSports_Sports" ManuallyRouted="false" />
         <AssociationConnector Association="SportsWeekdbModel.FK_SessionSports_Users" ManuallyRouted="false" />
         <AssociationConnector Association="SportsWeekdbModel.FK_Rules_Sports" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_Teams_Sports" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_Teams_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_TurnBaseGames_Teams" ManuallyRouted="false" />
+        <AssociationConnector Association="SportsWeekdbModel.FK_TurnBaseGames_Teams1" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
