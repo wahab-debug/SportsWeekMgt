@@ -12,6 +12,7 @@ namespace SportsWeek.Controllers
     public class GameController : ApiController
     {
         SportsWeekdbEntities db = new SportsWeekdbEntities();
+        //view all games of current session that is being played
         [HttpGet]
         public HttpResponseMessage gameBySession() {
             try
@@ -38,6 +39,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        //get all games of whole application
         [HttpGet]
         public HttpResponseMessage getAllgames() {
             try
@@ -50,6 +52,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        //add games in whole application
         [HttpPost]
         public HttpResponseMessage addGame(Sport game) {
             try
@@ -68,6 +71,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        //add game in current session to play in current session
         [HttpPost]
         public HttpResponseMessage gameAddToLatestSession(SessionSport game) 
         {

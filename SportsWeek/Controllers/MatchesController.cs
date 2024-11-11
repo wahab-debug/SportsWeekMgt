@@ -11,6 +11,7 @@ namespace SportsWeek.Controllers
     public class MatchesController : ApiController
     {
         SportsWeekdbEntities db = new SportsWeekdbEntities();
+        //get matches schedules of a sport between teams based on name
         [HttpGet]
         public HttpResponseMessage getMatches(string sportName) 
         {

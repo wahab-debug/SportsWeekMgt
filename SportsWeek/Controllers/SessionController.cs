@@ -11,6 +11,7 @@ namespace SportsWeek.Controllers
     public class SessionController : ApiController
     {
         SportsWeekdbEntities db = new SportsWeekdbEntities();
+        //return all sessions ever played
         [HttpGet]
         public HttpResponseMessage sessionList() 
         {
@@ -29,6 +30,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        // return name of current session
         [HttpGet]
         public HttpResponseMessage currentSession() {
             try
@@ -41,6 +43,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        //add session 
         [HttpPost]
         public HttpResponseMessage sessionAdd(Session session) 
         {
