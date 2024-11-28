@@ -11,7 +11,7 @@ namespace SportsWeek.Controllers
     public class RuleController : ApiController
     {
         SportsWeekdbEntities db = new SportsWeekdbEntities();
-
+        //return rule of specific sport
         [HttpGet]
         public HttpResponseMessage viewRules(int sportId) 
         {
@@ -30,13 +30,13 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError);
             }
         }
-
+        //edit rule of specific sport
         [HttpPost]
-        public HttpResponseMessage updateRules(int sportId, Rule rule) 
+        public HttpResponseMessage updateRules(Rule rule) 
         {
             try
             {
-                var result = db.Rules.FirstOrDefault(r=>r.sport_id==sportId);
+                var result = db.Rules.FirstOrDefault(r=>r.sport_id==rule.sport_id);
                 if (result == null) 
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -46,9 +46,9 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK);
 
             }
-            catch
+            catch(Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
             }
         }
 

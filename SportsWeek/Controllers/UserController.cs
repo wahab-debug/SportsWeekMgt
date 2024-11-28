@@ -11,7 +11,7 @@ namespace SportsWeek.Controllers
     public class UserController : ApiController
     {
         SportsWeekdbEntities db = new SportsWeekdbEntities();
-
+        //return users of applications
         [HttpGet]
         public HttpResponseMessage UserList()
         {
@@ -33,6 +33,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, ex.Message);
             }
         }
+        // return user on basis of reg number. this is used as login purpose
         [HttpGet]
         public HttpResponseMessage getById(string id) {
             try
@@ -65,6 +66,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        //post a new user habndle registration
         [HttpPost]
         public HttpResponseMessage PostUser(User user)
         {
@@ -85,6 +87,7 @@ namespace SportsWeek.Controllers
 
             }
         }
+        //update user in user table on basis of reg number
         [HttpPost]
         public HttpResponseMessage updateUser(string id,User user)
         {
@@ -107,6 +110,7 @@ namespace SportsWeek.Controllers
 
             }
         }
+        //delete a user on basis of reg number
         [HttpDelete]
         public HttpResponseMessage deleteUser(string id)
         {
@@ -129,7 +133,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-
+        // return list of user with role Mod and sports that are assigned to them on basis of recent session
         [HttpGet]
         public HttpResponseMessage getEventManagers() 
         {

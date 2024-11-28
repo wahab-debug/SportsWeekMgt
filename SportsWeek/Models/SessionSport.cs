@@ -14,12 +14,23 @@ namespace SportsWeek.Models
     
     public partial class SessionSport
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public SessionSport()
+        {
+            this.Fixtures = new HashSet<Fixture>();
+            this.Match_Events = new HashSet<Match_Events>();
+        }
+    
         public int id { get; set; }
         public Nullable<int> session_id { get; set; }
         public Nullable<int> sports_id { get; set; }
         public Nullable<int> managed_by { get; set; }
         public Nullable<int> no_of_teams { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Fixture> Fixtures { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Match_Events> Match_Events { get; set; }
         public virtual Session Session { get; set; }
         public virtual Sport Sport { get; set; }
         public virtual User User { get; set; }

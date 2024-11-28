@@ -43,7 +43,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-        //add session 
+        //add session in app
         [HttpPost]
         public HttpResponseMessage sessionAdd(Session session) 
         {

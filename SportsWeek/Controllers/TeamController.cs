@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Web.Http;
 
 namespace SportsWeek.Controllers
@@ -112,29 +113,7 @@ namespace SportsWeek.Controllers
 
             }
         }
-        /*[HttpDelete]
-        public HttpResponseMessage deleteTeam(string id)
-        {
-            try
-            {
-                var user = db.Users.FirstOrDefault(u => u.registration_no == id);
-
-                if (user == null)
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, "User not found");
-                }
-
-                db.Users.Remove(user);
-                db.SaveChanges();
-
-                return Request.CreateResponse(HttpStatusCode.OK, "User deleted successfully");
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }*/
-        //return list of teams based on assigned sports to mod
+       //return list of teams for specific sport that is assigned to the manager
         [HttpGet]
         public HttpResponseMessage AllTeamsByEM(string emRegNo)
         {
@@ -173,7 +152,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-        //approve team status to 1 and chn
+        //approve team status to 1 and change role of user to captain who applied for team if role is not captain
         [HttpPost]
         public HttpResponseMessage ApproveTeamById([FromBody]int teamid)
         {
@@ -210,6 +189,34 @@ namespace SportsWeek.Controllers
             catch (Exception ex)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        //return number of teams allowed for specific sport of current session
+        [HttpGet]
+        public HttpResponseMessage allowedTeams(int userId) 
+        {
+            try 
+            {
+                // Query to find the number of teams for the latest session of the specified sport
+                var query = (from ss in db.SessionSports
+                             join s in db.Sports on ss.sports_id equals s.id
+                             join ses in db.Sessions on ss.session_id equals ses.id
+                             where ss.managed_by == userId
+                             orderby ses.start_date descending
+                             select ss.no_of_teams).FirstOrDefault();
+
+                // If no result is found, return a 404 or appropriate response
+                if (query == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "No sessions found for the specified sport.");
+                }
+
+                // If a result is found, return the number of teams
+                return Request.CreateResponse(HttpStatusCode.OK, query);
+            }
+            catch (Exception ex) 
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
             }
         }
     }

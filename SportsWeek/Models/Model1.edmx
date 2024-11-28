@@ -4,12 +4,12 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="SportsWeekdbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="SportsWeekdbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Comments">
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="fixture_id" Type="int" Nullable="false" />
           <Property Name="comments" Type="varchar(max)" />
         </EntityType>
@@ -29,10 +29,13 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="team1_id" Type="int" Nullable="false" />
-          <Property Name="team2_id" Type="int" Nullable="false" />
-          <Property Name="matchDate" Type="datetime" Nullable="false" />
+          <Property Name="team1_id" Type="int" />
+          <Property Name="team2_id" Type="int" />
+          <Property Name="matchDate" Type="datetime" />
           <Property Name="venue" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="match_type" Type="varchar" MaxLength="30" />
+          <Property Name="winner_id" Type="int" />
+          <Property Name="sessionSport_id" Type="int" />
         </EntityType>
         <EntityType Name="FixturesImages">
           <Key>
@@ -46,10 +49,23 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="team_id" Type="int" Nullable="false" />
           <Property Name="fixture_id" Type="int" Nullable="false" />
           <Property Name="goals" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Match_Events">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fixture_id" Type="int" />
+          <Property Name="event_time" Type="datetime" />
+          <Property Name="event_type" Type="varchar" MaxLength="50" />
+          <Property Name="event_description" Type="text" />
+          <Property Name="sessionSport_id" Type="int" />
+          <Property Name="player_id" Type="int" />
+          <Property Name="secondary_player_id" Type="int" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -68,14 +84,13 @@
           <Property Name="fixture_id" Type="int" Nullable="false" />
           <Property Name="setsWon" Type="int" Nullable="false" />
         </EntityType>
-        <!--Errors Found During Generation:
-warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="Rules">
           <Key>
-            <PropertyRef Name="sport_id" />
+            <PropertyRef Name="id" />
           </Key>
           <Property Name="sport_id" Type="int" Nullable="false" />
           <Property Name="rule_of_game" Type="varchar(max)" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
         </EntityType>
         <EntityType Name="Sessions">
           <Key>
@@ -156,6 +171,54 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <Property Name="password" Type="varchar" MaxLength="100" />
           <Property Name="role" Type="varchar" MaxLength="20" />
         </EntityType>
+        <Association Name="FK__Match_Eve__fixtu__42ACE4D4">
+          <End Role="Fixtures" Type="Self.Fixtures" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Fixtures">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="fixture_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Match_Eve__playe__43A1090D">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Match_Eve__secon__44952D46">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="secondary_player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Match_Eve__sessi__4589517F">
+          <End Role="SessionSports" Type="Self.SessionSports" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SessionSports">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="sessionSport_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Comments_Fixtures">
           <End Role="Fixtures" Type="Self.Fixtures" Multiplicity="1" />
           <End Role="Comments" Type="Self.Comments" Multiplicity="*" />
@@ -192,8 +255,20 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Fixtures_SessionSports">
+          <End Role="SessionSports" Type="Self.SessionSports" Multiplicity="0..1" />
+          <End Role="Fixtures" Type="Self.Fixtures" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SessionSports">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Fixtures">
+              <PropertyRef Name="sessionSport_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Fixtures_Teams">
-          <End Role="Teams" Type="Self.Teams" Multiplicity="1" />
+          <End Role="Teams" Type="Self.Teams" Multiplicity="0..1" />
           <End Role="Fixtures" Type="Self.Fixtures" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Teams">
@@ -205,7 +280,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Fixtures_Teams1">
-          <End Role="Teams" Type="Self.Teams" Multiplicity="1" />
+          <End Role="Teams" Type="Self.Teams" Multiplicity="0..1" />
           <End Role="Fixtures" Type="Self.Fixtures" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Teams">
@@ -302,7 +377,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
         </Association>
         <Association Name="FK_Rules_Sports">
           <End Role="Sports" Type="Self.Sports" Multiplicity="1" />
-          <End Role="Rules" Type="Self.Rules" Multiplicity="0..1" />
+          <End Role="Rules" Type="Self.Rules" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Sports">
               <PropertyRef Name="id" />
@@ -426,8 +501,10 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <EntitySet Name="Fixtures" EntityType="Self.Fixtures" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="FixturesImages" EntityType="Self.FixturesImages" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="GoalBaseScore" EntityType="Self.GoalBaseScore" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Match_Events" EntityType="Self.Match_Events" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Player" EntityType="Self.Player" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PointsBaseScore" EntityType="Self.PointsBaseScore" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Rules" EntityType="Self.Rules" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sessions" EntityType="Self.Sessions" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SessionSports" EntityType="Self.SessionSports" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sports" EntityType="Self.Sports" Schema="dbo" store:Type="Tables" />
@@ -436,12 +513,22 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <EntitySet Name="Teams" EntityType="Self.Teams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="TurnBaseGames" EntityType="Self.TurnBaseGames" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Rules" EntityType="Self.Rules" store:Type="Tables" store:Schema="dbo">
-            <DefiningQuery>SELECT 
-    [Rules].[sport_id] AS [sport_id], 
-    [Rules].[rule_of_game] AS [rule_of_game]
-    FROM [dbo].[Rules] AS [Rules]</DefiningQuery>
-          </EntitySet>
+          <AssociationSet Name="FK__Match_Eve__fixtu__42ACE4D4" Association="Self.FK__Match_Eve__fixtu__42ACE4D4">
+            <End Role="Fixtures" EntitySet="Fixtures" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Match_Eve__playe__43A1090D" Association="Self.FK__Match_Eve__playe__43A1090D">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Match_Eve__secon__44952D46" Association="Self.FK__Match_Eve__secon__44952D46">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Match_Eve__sessi__4589517F" Association="Self.FK__Match_Eve__sessi__4589517F">
+            <End Role="SessionSports" EntitySet="SessionSports" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
+          </AssociationSet>
           <AssociationSet Name="FK_Comments_Fixtures" Association="Self.FK_Comments_Fixtures">
             <End Role="Fixtures" EntitySet="Fixtures" />
             <End Role="Comments" EntitySet="Comments" />
@@ -453,6 +540,10 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <AssociationSet Name="FK_CricketScore_Teams" Association="Self.FK_CricketScore_Teams">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="CricketScore" EntitySet="CricketScore" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Fixtures_SessionSports" Association="Self.FK_Fixtures_SessionSports">
+            <End Role="SessionSports" EntitySet="SessionSports" />
+            <End Role="Fixtures" EntitySet="Fixtures" />
           </AssociationSet>
           <AssociationSet Name="FK_Fixtures_Teams" Association="Self.FK_Fixtures_Teams">
             <End Role="Teams" EntitySet="Teams" />
@@ -531,8 +622,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             <End Role="TurnBaseGames" EntitySet="TurnBaseGames" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="SportsWeekdbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -540,7 +630,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="fixture_id" Type="Int32" Nullable="false" />
           <Property Name="comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Fixture" Relationship="Self.FK_Comments_Fixtures" FromRole="Comments" ToRole="Fixtures" />
@@ -563,12 +653,17 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="team1_id" Type="Int32" Nullable="false" />
-          <Property Name="team2_id" Type="Int32" Nullable="false" />
-          <Property Name="matchDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="team1_id" Type="Int32" />
+          <Property Name="team2_id" Type="Int32" />
+          <Property Name="matchDate" Type="DateTime" Precision="3" />
           <Property Name="venue" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="match_type" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="winner_id" Type="Int32" />
+          <Property Name="sessionSport_id" Type="Int32" />
           <NavigationProperty Name="Comments" Relationship="Self.FK_Comments_Fixtures" FromRole="Fixtures" ToRole="Comments" />
           <NavigationProperty Name="CricketScores" Relationship="Self.FK_CricketScore_Fixtures" FromRole="Fixtures" ToRole="CricketScore" />
+          <NavigationProperty Name="Match_Events" Relationship="Self.FK__Match_Eve__fixtu__42ACE4D4" FromRole="Fixtures" ToRole="Match_Events" />
+          <NavigationProperty Name="SessionSport" Relationship="Self.FK_Fixtures_SessionSports" FromRole="Fixtures" ToRole="SessionSports" />
           <NavigationProperty Name="Team" Relationship="Self.FK_Fixtures_Teams" FromRole="Fixtures" ToRole="Teams" />
           <NavigationProperty Name="Team1" Relationship="Self.FK_Fixtures_Teams1" FromRole="Fixtures" ToRole="Teams" />
           <NavigationProperty Name="FixturesImages" Relationship="Self.FK_FixturesImages_Fixtures" FromRole="Fixtures" ToRole="FixturesImages" />
@@ -589,12 +684,29 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="team_id" Type="Int32" Nullable="false" />
           <Property Name="fixture_id" Type="Int32" Nullable="false" />
           <Property Name="goals" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Fixture" Relationship="Self.FK_GoalBaseScore_Fixtures" FromRole="GoalBaseScore" ToRole="Fixtures" />
           <NavigationProperty Name="Team" Relationship="Self.FK_GoalBaseScore_Teams" FromRole="GoalBaseScore" ToRole="Teams" />
+        </EntityType>
+        <EntityType Name="Match_Events">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fixture_id" Type="Int32" />
+          <Property Name="event_time" Type="DateTime" Precision="3" />
+          <Property Name="event_type" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="event_description" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="sessionSport_id" Type="Int32" />
+          <Property Name="player_id" Type="Int32" />
+          <Property Name="secondary_player_id" Type="Int32" />
+          <NavigationProperty Name="Fixture" Relationship="Self.FK__Match_Eve__fixtu__42ACE4D4" FromRole="Match_Events" ToRole="Fixtures" />
+          <NavigationProperty Name="Player" Relationship="Self.FK__Match_Eve__playe__43A1090D" FromRole="Match_Events" ToRole="Player" />
+          <NavigationProperty Name="Player1" Relationship="Self.FK__Match_Eve__secon__44952D46" FromRole="Match_Events" ToRole="Player" />
+          <NavigationProperty Name="SessionSport" Relationship="Self.FK__Match_Eve__sessi__4589517F" FromRole="Match_Events" ToRole="SessionSports" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -603,6 +715,8 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <Property Name="reg_no" Type="String" MaxLength="14" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="team_id" Type="Int32" Nullable="false" />
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Match_Events" Relationship="Self.FK__Match_Eve__playe__43A1090D" FromRole="Player" ToRole="Match_Events" />
+          <NavigationProperty Name="Match_Events1" Relationship="Self.FK__Match_Eve__secon__44952D46" FromRole="Player" ToRole="Match_Events" />
           <NavigationProperty Name="Student" Relationship="Self.FK_Player_Student" FromRole="Player" ToRole="Student" />
           <NavigationProperty Name="Team" Relationship="Self.FK_Player_Teams" FromRole="Player" ToRole="Teams" />
         </EntityType>
@@ -616,6 +730,15 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <Property Name="setsWon" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Fixture" Relationship="Self.FK_PointsBaseScore_Fixtures" FromRole="PointsBaseScore" ToRole="Fixtures" />
           <NavigationProperty Name="Team" Relationship="Self.FK_PointsBaseScore_Teams" FromRole="PointsBaseScore" ToRole="Teams" />
+        </EntityType>
+        <EntityType Name="Rule">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="sport_id" Type="Int32" Nullable="false" />
+          <Property Name="rule_of_game" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Sport" Relationship="Self.FK_Rules_Sports" FromRole="Rules" ToRole="Sports" />
         </EntityType>
         <EntityType Name="Session">
           <Key>
@@ -637,6 +760,8 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <Property Name="sports_id" Type="Int32" />
           <Property Name="managed_by" Type="Int32" />
           <Property Name="no_of_teams" Type="Int32" />
+          <NavigationProperty Name="Fixtures" Relationship="Self.FK_Fixtures_SessionSports" FromRole="SessionSports" ToRole="Fixtures" />
+          <NavigationProperty Name="Match_Events" Relationship="Self.FK__Match_Eve__sessi__4589517F" FromRole="SessionSports" ToRole="Match_Events" />
           <NavigationProperty Name="Session" Relationship="Self.FK_SessionSports_Sessions" FromRole="SessionSports" ToRole="Sessions" />
           <NavigationProperty Name="Sport" Relationship="Self.FK_SessionSports_Sports" FromRole="SessionSports" ToRole="Sports" />
           <NavigationProperty Name="User" Relationship="Self.FK_SessionSports_Users" FromRole="SessionSports" ToRole="Users" />
@@ -648,8 +773,8 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="game" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="game_type" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Rules" Relationship="Self.FK_Rules_Sports" FromRole="Sports" ToRole="Rules" />
           <NavigationProperty Name="SessionSports" Relationship="Self.FK_SessionSports_Sports" FromRole="Sports" ToRole="SessionSports" />
-          <NavigationProperty Name="Rule" Relationship="Self.FK_Rules_Sports" FromRole="Sports" ToRole="Rules" />
           <NavigationProperty Name="Teams" Relationship="Self.FK_Teams_Sports" FromRole="Sports" ToRole="Teams" />
         </EntityType>
         <EntityType Name="Student">
@@ -721,14 +846,6 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <NavigationProperty Name="SessionSports" Relationship="Self.FK_SessionSports_Users" FromRole="Users" ToRole="SessionSports" />
           <NavigationProperty Name="Teams" Relationship="Self.FK_Teams_Users" FromRole="Users" ToRole="Teams" />
         </EntityType>
-        <EntityType Name="Rule">
-          <Key>
-            <PropertyRef Name="sport_id" />
-          </Key>
-          <Property Name="sport_id" Type="Int32" Nullable="false" />
-          <Property Name="rule_of_game" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <NavigationProperty Name="Sport" Relationship="Self.FK_Rules_Sports" FromRole="Rules" ToRole="Sports" />
-        </EntityType>
         <Association Name="FK_Comments_Fixtures">
           <End Role="Fixtures" Type="Self.Fixture" Multiplicity="1" />
           <End Role="Comments" Type="Self.Comment" Multiplicity="*" />
@@ -765,8 +882,32 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__Match_Eve__fixtu__42ACE4D4">
+          <End Role="Fixtures" Type="Self.Fixture" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Fixtures">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="fixture_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Fixtures_SessionSports">
+          <End Role="SessionSports" Type="Self.SessionSport" Multiplicity="0..1" />
+          <End Role="Fixtures" Type="Self.Fixture" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SessionSports">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Fixtures">
+              <PropertyRef Name="sessionSport_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Fixtures_Teams">
-          <End Role="Teams" Type="Self.Team" Multiplicity="1" />
+          <End Role="Teams" Type="Self.Team" Multiplicity="0..1" />
           <End Role="Fixtures" Type="Self.Fixture" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Teams">
@@ -778,7 +919,7 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Fixtures_Teams1">
-          <End Role="Teams" Type="Self.Team" Multiplicity="1" />
+          <End Role="Teams" Type="Self.Team" Multiplicity="0..1" />
           <End Role="Fixtures" Type="Self.Fixture" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Teams">
@@ -849,6 +990,42 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__Match_Eve__playe__43A1090D">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Match_Eve__secon__44952D46">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="secondary_player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Match_Eve__sessi__4589517F">
+          <End Role="SessionSports" Type="Self.SessionSport" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SessionSports">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="sessionSport_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Player_Student">
           <End Role="Student" Type="Self.Student" Multiplicity="1" />
           <End Role="Player" Type="Self.Player" Multiplicity="*" />
@@ -882,6 +1059,18 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </Principal>
             <Dependent Role="PointsBaseScore">
               <PropertyRef Name="team_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Rules_Sports">
+          <End Role="Sports" Type="Self.Sport" Multiplicity="1" />
+          <End Role="Rules" Type="Self.Rule" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Sports">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Rules">
+              <PropertyRef Name="sport_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -930,18 +1119,6 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             </Principal>
             <Dependent Role="SessionSports">
               <PropertyRef Name="managed_by" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Rules_Sports">
-          <End Role="Sports" Type="Self.Sport" Multiplicity="1" />
-          <End Role="Rules" Type="Self.Rule" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="Sports">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="Rules">
-              <PropertyRef Name="sport_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -999,8 +1176,10 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <EntitySet Name="Fixtures" EntityType="Self.Fixture" />
           <EntitySet Name="FixturesImages" EntityType="Self.FixturesImage" />
           <EntitySet Name="GoalBaseScores" EntityType="Self.GoalBaseScore" />
+          <EntitySet Name="Match_Events" EntityType="Self.Match_Events" />
           <EntitySet Name="Players" EntityType="Self.Player" />
           <EntitySet Name="PointsBaseScores" EntityType="Self.PointsBaseScore" />
+          <EntitySet Name="Rules" EntityType="Self.Rule" />
           <EntitySet Name="Sessions" EntityType="Self.Session" />
           <EntitySet Name="SessionSports" EntityType="Self.SessionSport" />
           <EntitySet Name="Sports" EntityType="Self.Sport" />
@@ -1009,7 +1188,6 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <EntitySet Name="Teams" EntityType="Self.Team" />
           <EntitySet Name="TurnBaseGames" EntityType="Self.TurnBaseGame" />
           <EntitySet Name="Users" EntityType="Self.User" />
-          <EntitySet Name="Rules" EntityType="Self.Rule" />
           <AssociationSet Name="FK_Comments_Fixtures" Association="Self.FK_Comments_Fixtures">
             <End Role="Fixtures" EntitySet="Fixtures" />
             <End Role="Comments" EntitySet="Comments" />
@@ -1021,6 +1199,14 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <AssociationSet Name="FK_CricketScore_Teams" Association="Self.FK_CricketScore_Teams">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="CricketScore" EntitySet="CricketScores" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Match_Eve__fixtu__42ACE4D4" Association="Self.FK__Match_Eve__fixtu__42ACE4D4">
+            <End Role="Fixtures" EntitySet="Fixtures" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Fixtures_SessionSports" Association="Self.FK_Fixtures_SessionSports">
+            <End Role="SessionSports" EntitySet="SessionSports" />
+            <End Role="Fixtures" EntitySet="Fixtures" />
           </AssociationSet>
           <AssociationSet Name="FK_Fixtures_Teams" Association="Self.FK_Fixtures_Teams">
             <End Role="Teams" EntitySet="Teams" />
@@ -1050,6 +1236,18 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
             <End Role="Teams" EntitySet="Teams" />
             <End Role="GoalBaseScore" EntitySet="GoalBaseScores" />
           </AssociationSet>
+          <AssociationSet Name="FK__Match_Eve__playe__43A1090D" Association="Self.FK__Match_Eve__playe__43A1090D">
+            <End Role="Player" EntitySet="Players" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Match_Eve__secon__44952D46" Association="Self.FK__Match_Eve__secon__44952D46">
+            <End Role="Player" EntitySet="Players" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Match_Eve__sessi__4589517F" Association="Self.FK__Match_Eve__sessi__4589517F">
+            <End Role="SessionSports" EntitySet="SessionSports" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
+          </AssociationSet>
           <AssociationSet Name="FK_Player_Student" Association="Self.FK_Player_Student">
             <End Role="Student" EntitySet="Students" />
             <End Role="Player" EntitySet="Players" />
@@ -1061,6 +1259,10 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <AssociationSet Name="FK_PointsBaseScore_Teams" Association="Self.FK_PointsBaseScore_Teams">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="PointsBaseScore" EntitySet="PointsBaseScores" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Rules_Sports" Association="Self.FK_Rules_Sports">
+            <End Role="Sports" EntitySet="Sports" />
+            <End Role="Rules" EntitySet="Rules" />
           </AssociationSet>
           <AssociationSet Name="FK_SessionSports_Sessions" Association="Self.FK_SessionSports_Sessions">
             <End Role="Sessions" EntitySet="Sessions" />
@@ -1077,10 +1279,6 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
           <AssociationSet Name="FK_SessionSports_Users" Association="Self.FK_SessionSports_Users">
             <End Role="Users" EntitySet="Users" />
             <End Role="SessionSports" EntitySet="SessionSports" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Rules_Sports" Association="Self.FK_Rules_Sports">
-            <End Role="Sports" EntitySet="Sports" />
-            <End Role="Rules" EntitySet="Rules" />
           </AssociationSet>
           <AssociationSet Name="FK_Teams_Sports" Association="Self.FK_Teams_Sports">
             <End Role="Sports" EntitySet="Sports" />
@@ -1134,6 +1332,9 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
                 <ScalarProperty Name="team2_id" ColumnName="team2_id" />
                 <ScalarProperty Name="matchDate" ColumnName="matchDate" />
                 <ScalarProperty Name="venue" ColumnName="venue" />
+                <ScalarProperty Name="match_type" ColumnName="match_type" />
+                <ScalarProperty Name="winner_id" ColumnName="winner_id" />
+                <ScalarProperty Name="sessionSport_id" ColumnName="sessionSport_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1156,6 +1357,20 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Match_Events">
+            <EntityTypeMapping TypeName="SportsWeekdbModel.Match_Events">
+              <MappingFragment StoreEntitySet="Match_Events">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="fixture_id" ColumnName="fixture_id" />
+                <ScalarProperty Name="event_time" ColumnName="event_time" />
+                <ScalarProperty Name="event_type" ColumnName="event_type" />
+                <ScalarProperty Name="event_description" ColumnName="event_description" />
+                <ScalarProperty Name="sessionSport_id" ColumnName="sessionSport_id" />
+                <ScalarProperty Name="player_id" ColumnName="player_id" />
+                <ScalarProperty Name="secondary_player_id" ColumnName="secondary_player_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Players">
             <EntityTypeMapping TypeName="SportsWeekdbModel.Player">
               <MappingFragment StoreEntitySet="Player">
@@ -1172,6 +1387,15 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
                 <ScalarProperty Name="team_id" ColumnName="team_id" />
                 <ScalarProperty Name="fixture_id" ColumnName="fixture_id" />
                 <ScalarProperty Name="setsWon" ColumnName="setsWon" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Rules">
+            <EntityTypeMapping TypeName="SportsWeekdbModel.Rule">
+              <MappingFragment StoreEntitySet="Rules">
+                <ScalarProperty Name="sport_id" ColumnName="sport_id" />
+                <ScalarProperty Name="rule_of_game" ColumnName="rule_of_game" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1259,14 +1483,6 @@ warning 6002: The table/view 'SportsWeekdb.dbo.Rules' does not have a primary ke
                 <ScalarProperty Name="registration_no" ColumnName="registration_no" />
                 <ScalarProperty Name="password" ColumnName="password" />
                 <ScalarProperty Name="role" ColumnName="role" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Rules">
-            <EntityTypeMapping TypeName="SportsWeekdbModel.Rule">
-              <MappingFragment StoreEntitySet="Rules">
-                <ScalarProperty Name="sport_id" ColumnName="sport_id" />
-                <ScalarProperty Name="rule_of_game" ColumnName="rule_of_game" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

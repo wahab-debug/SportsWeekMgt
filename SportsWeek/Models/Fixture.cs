@@ -19,6 +19,7 @@ namespace SportsWeek.Models
         {
             this.Comments = new HashSet<Comment>();
             this.CricketScores = new HashSet<CricketScore>();
+            this.Match_Events = new HashSet<Match_Events>();
             this.FixturesImages = new HashSet<FixturesImage>();
             this.GoalBaseScores = new HashSet<GoalBaseScore>();
             this.PointsBaseScores = new HashSet<PointsBaseScore>();
@@ -26,15 +27,21 @@ namespace SportsWeek.Models
         }
     
         public int id { get; set; }
-        public int team1_id { get; set; }
-        public int team2_id { get; set; }
-        public System.DateTime matchDate { get; set; }
+        public Nullable<int> team1_id { get; set; }
+        public Nullable<int> team2_id { get; set; }
+        public Nullable<System.DateTime> matchDate { get; set; }
         public string venue { get; set; }
+        public string match_type { get; set; }
+        public Nullable<int> winner_id { get; set; }
+        public Nullable<int> sessionSport_id { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Comment> Comments { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CricketScore> CricketScores { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Match_Events> Match_Events { get; set; }
+        public virtual SessionSport SessionSport { get; set; }
         public virtual Team Team { get; set; }
         public virtual Team Team1 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

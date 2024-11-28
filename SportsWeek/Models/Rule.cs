@@ -16,6 +16,7 @@ namespace SportsWeek.Models
     {
         public int sport_id { get; set; }
         public string rule_of_game { get; set; }
+        public int id { get; set; }
     
         public virtual Sport Sport { get; set; }
     }

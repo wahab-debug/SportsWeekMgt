@@ -14,10 +14,21 @@ namespace SportsWeek.Models
     
     public partial class Player
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Player()
+        {
+            this.Match_Events = new HashSet<Match_Events>();
+            this.Match_Events1 = new HashSet<Match_Events>();
+        }
+    
         public string reg_no { get; set; }
         public int team_id { get; set; }
         public int id { get; set; }
     
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Match_Events> Match_Events { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Match_Events> Match_Events1 { get; set; }
         public virtual Student Student { get; set; }
         public virtual Team Team { get; set; }
     }
