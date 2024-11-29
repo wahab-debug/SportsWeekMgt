@@ -20,28 +20,21 @@ namespace SportsWeek.Controllers
         {
             try
             {
-                // Get the file from the request
+                // Get the files from the request (multiple files support)
                 var httpRequest = HttpContext.Current.Request;
-                var fixtureImage = httpRequest.Files["fixtureImage"];
+                var fixtureImages = httpRequest.Files;
 
-                // Check if the file exists
-                if (fixtureImage == null || fixtureImage.ContentLength == 0)
+                // Check if no files are uploaded
+                if (fixtureImages.Count == 0)
                 {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, "No image uploaded.");
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "No images uploaded.");
                 }
 
                 // Define valid image extensions
                 var validExtensions = new List<string>
-                {
-                    ".jpeg", ".jpg", ".png", ".webp", ".gif"
-                };
-
-                // Check if the file extension is valid
-                var extension = Path.GetExtension(fixtureImage.FileName).ToLower();
-                if (!validExtensions.Contains(extension))
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Not a valid format.");
-                }
+                                            {
+                                                ".jpeg", ".jpg", ".png", ".webp", ".gif"
+                                            };
 
                 // Check if the fixture exists using your database context
                 var fixtureExists = db.Fixtures.Any(f => f.id == fixturesId);
@@ -50,36 +43,67 @@ namespace SportsWeek.Controllers
                     return Request.CreateResponse(HttpStatusCode.NotFound, "Fixture not found.");
                 }
 
-                // Generate a unique file name
-                var fileName = Guid.NewGuid() + extension;
+                // List to hold the image paths to return in the response
+                var imagePaths = new List<string>();
 
-                var uploadPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "uploads", "fixtures");
-
-                // Ensure the directory exists
-                if (!Directory.Exists(uploadPath))
+                foreach (string fileKey in fixtureImages)
                 {
-                    Directory.CreateDirectory(uploadPath);
+                    var fixtureImage = fixtureImages[fileKey];
+
+                    // Check if the file is valid
+                    if (fixtureImage == null || fixtureImage.ContentLength == 0)
+                    {
+                        continue; // Skip invalid files
+                    }
+
+                    // Check if the file extension is valid
+                    var extension = Path.GetExtension(fixtureImage.FileName).ToLower();
+                    if (!validExtensions.Contains(extension))
+                    {
+                        continue; // Skip invalid files
+                    }
+
+                    // Generate a unique file name for each image
+                    var fileName = Guid.NewGuid() + extension;
+
+                    // Define the upload path for the image
+                    var uploadPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "uploads", "fixtures");
+
+                    // Ensure the directory exists
+                    if (!Directory.Exists(uploadPath))
+                    {
+                        Directory.CreateDirectory(uploadPath);
+                    }
+
+                    // Full file path to save the image
+                    var filePath = Path.Combine(uploadPath, fileName);
+
+                    // Save the image to the file system
+                    fixtureImage.SaveAs(filePath);
+
+                    // Create a record for the image in the FixturesImages table
+                    var fixtureImageRecord = new FixturesImage
+                    {
+                        fixtures_id = fixturesId,
+                        image_path = "/uploads/fixtures/" + fileName // Save relative path in the database
+                    };
+
+                    // Add the image record to the database and save changes
+                    db.FixturesImages.Add(fixtureImageRecord);
+                    db.SaveChanges();
+
+                    // Add the image path to the list to return in the response
+                    imagePaths.Add(fixtureImageRecord.image_path);
                 }
 
-                // Full file path to save the image
-                var filePath = Path.Combine(uploadPath, fileName);
-
-                // Save the image to the file system
-                fixtureImage.SaveAs(filePath);
-
-                // Create a record for the image in the FixturesImages table
-                var fixtureImageRecord = new FixturesImage
+                // Check if any images were successfully uploaded
+                if (imagePaths.Count == 0)
                 {
-                    fixtures_id = fixturesId,
-                    image_path = "/uploads/fixtures/" + fileName // Save relative path in the database
-                };
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "No valid images uploaded.");
+                }
 
-                // Add the image record to the database and save changes
-                db.FixturesImages.Add(fixtureImageRecord);
-                db.SaveChanges();
-
-                // Return the image path as a response
-                return Request.CreateResponse(HttpStatusCode.OK, fixtureImageRecord.image_path);
+                // Return the image paths as a response
+                return Request.CreateResponse(HttpStatusCode.OK, imagePaths);
             }
             catch (Exception ex)
             {
