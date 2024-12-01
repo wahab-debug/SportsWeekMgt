@@ -49,7 +49,7 @@ namespace SportsWeek.Controllers
             }
         }
 
-        //set matches of a sport full schedule
+        //set matches of a sport by creating complete schedule
         public HttpResponseMessage setSchedule(string EmRegNo, Fixture[] fixture) 
         {
             try 
@@ -90,5 +90,83 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+        //get all match schedules that are not filled yet where id is null for teams
+        [HttpGet]
+        public HttpResponseMessage AllScheduledFixtures(string emRegNo)
+        {
+            try
+            {
+
+                var eventManager = db.Users.FirstOrDefault(u => u.registration_no == emRegNo);
+
+
+                var latestSession = db.Sessions.OrderByDescending(s => s.end_date).FirstOrDefault();
+
+                var sessionsport = db.SessionSports
+                    .FirstOrDefault(ss => ss.managed_by == eventManager.id && ss.session_id == latestSession.id);
+
+                var unresolvedFixtures = db.Fixtures
+                    .Select(f => new
+                    {
+                        f.id,
+                        f.team1_id,
+                        f.team2_id,
+                        f.matchDate,
+                        f.venue,
+                        f.sessionSport_id,
+                        f.match_type,
+                        f.winner_id
+                    })
+                    .Where(f => f.winner_id == null && f.sessionSport_id == sessionsport.id)
+                    .ToList();
+
+
+                return Request.CreateResponse(HttpStatusCode.OK, unresolvedFixtures);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "An unexpected error occurred: " + ex.Message);
+            }
+        }
+        //update names of teams in schedule
+        [HttpPut]
+        public HttpResponseMessage UpdateFixture(Fixture[] fixtures)
+        {
+            try
+            {
+                foreach (var fixture in fixtures)
+                {
+                    // Fetch team1_id and team2_id based on team names
+                    var team1 = db.Teams
+                                     .Where(t => t.teamid == fixture.team1_id) // Assuming fixture has team1Name
+                                     .FirstOrDefault();
+
+                    var team2 = db.Teams
+                                     .Where(t => t.teamid == fixture.team2_id) // Assuming fixture has team2Name
+                                     .FirstOrDefault();
+
+                    // Fetch the fixture from the database by fixture id
+                    var fixtureToUpdate = db.Fixtures
+                                             .FirstOrDefault(f => f.id == fixture.id); // Assuming fixture has id
+
+                    if (team1 != null && team2 != null && fixtureToUpdate != null)
+                    {
+                        // Update team1_id, team2_id, and set winner_id to 0
+                        fixtureToUpdate.team1_id = team1.teamid;
+                        fixtureToUpdate.team2_id = team2.teamid;
+
+                        // Save changes for the current fixture
+                        db.SaveChanges();
+                    }
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, "Fixtures updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
     }
 }
