@@ -355,7 +355,7 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\uploads\fixtures\" />
+    <Folder Include="App_Data\" />
     <Folder Include="Resources\uploads\fixtures\" />
   </ItemGroup>
   <ItemGroup>

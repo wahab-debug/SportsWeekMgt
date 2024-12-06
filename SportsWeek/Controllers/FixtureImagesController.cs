@@ -24,6 +24,7 @@ namespace SportsWeek.Controllers
                 var httpRequest = HttpContext.Current.Request;
                 var fixtureImages = httpRequest.Files;
 
+
                 // Check if no files are uploaded
                 if (fixtureImages.Count == 0)
                 {
@@ -46,9 +47,9 @@ namespace SportsWeek.Controllers
                 // List to hold the image paths to return in the response
                 var imagePaths = new List<string>();
 
-                foreach (string fileKey in fixtureImages)
+                for (int i = 0; i < fixtureImages.Count; i++)
                 {
-                    var fixtureImage = fixtureImages[fileKey];
+                    var fixtureImage = fixtureImages[i];
 
                     // Check if the file is valid
                     if (fixtureImage == null || fixtureImage.ContentLength == 0)
@@ -66,8 +67,8 @@ namespace SportsWeek.Controllers
                     // Generate a unique file name for each image
                     var fileName = Guid.NewGuid() + extension;
 
-                    // Define the upload path for the image
-                    var uploadPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "uploads", "fixtures");
+                    // Define the upload path for the image inside Resources/uploads/fixtures
+                    var uploadPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "uploads", "fixtures");
 
                     // Ensure the directory exists
                     if (!Directory.Exists(uploadPath))
@@ -131,10 +132,11 @@ namespace SportsWeek.Controllers
                 foreach (var fixtureImageRecord in fixtureImageRecords)
                 {
                     // Get the full file path from the database (the relative path)
-                    var imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "uploads", "fixtures", Path.GetFileName(fixtureImageRecord.image_path));
+                    var imagePath = Path.Combine("Resources", "uploads", "fixtures", Path.GetFileName(fixtureImageRecord.image_path));
+                    var actualPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, imagePath);
 
                     // Check if the file exists
-                    if (!File.Exists(imagePath))
+                    if (!File.Exists(actualPath))
                     {
                         continue; // Skip this image if it doesn't exist
                     }

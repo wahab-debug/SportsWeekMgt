@@ -17,38 +17,49 @@ namespace SportsWeek.Controllers
         {
             try
             {
+                // Retrieve the sport object based on the sport name
+                var sport = db.Sports.FirstOrDefault(s => s.game == sportName);
+                if (sport == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "Sport not found.");
+                }
+
+                // Query for the relevant fixtures based on the sport name
                 var fixturesQuery =
                 from f in db.Fixtures
-                join t1 in db.Teams on f.team1_id equals t1.teamid
-                join t2 in db.Teams on f.team2_id equals t2.teamid
-                join s in db.Sports on t1.sport_id equals s.id into t1Sports
-                from s in t1Sports.DefaultIfEmpty()
-                join s2 in db.Sports on t2.sport_id equals s2.id into t2Sports
-                from s2 in t2Sports.DefaultIfEmpty()
-                where s.game == sportName || s2.game == sportName
+                join t1 in db.Teams on f.team1_id equals t1.teamid into t1Teams
+                from t1 in t1Teams.DefaultIfEmpty()
+                join t2 in db.Teams on f.team2_id equals t2.teamid into t2Teams
+                from t2 in t2Teams.DefaultIfEmpty()
+                join ss in db.SessionSports on f.sessionSport_id equals ss.id
+                join s in db.Sports on ss.sports_id equals s.id
+                where s.game == sportName
                 select new
                 {
                     fixture_id = f.id,
-                    team1_name = t1 != null ? t1.Tname : "Yet to Decide",  // If no team1, set to "Yet to Decide"
-                    team2_name = t2 != null ? t2.Tname : "Yet to Decide",  // If no team2, set to "Yet to Decide"
+                    team1_name = f.team1_id == null ? "Yet to Decide" : (t1 != null ? t1.Tname : "Yet to Decide"),
+                    team2_name = f.team2_id == null ? "Yet to Decide" : (t2 != null ? t2.Tname : "Yet to Decide"),
                     matchDate = f.matchDate,
                     venue = f.venue,
                     winner_id = f.winner_id,
                     match_type = f.match_type,
-                    sport_name = s != null ? s.game : (s2 != null ? s2.game : null),
-                    sport_type = s != null ? s.game_type : (s2 != null ? s2.game_type : null)
+                    sport_name = s.game,
+                    sport_type = s.game_type
                 };
+
+                // Execute the query and get the results
                 var results = fixturesQuery.ToList();
 
+                // Return the match list as a response
                 return Request.CreateResponse(HttpStatusCode.OK, results);
-
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                // Handle any unexpected errors
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "An error occurred: " + ex.Message);
             }
         }
-
+        
         //set matches of a sport by creating complete schedule
         public HttpResponseMessage setSchedule(string EmRegNo, Fixture[] fixture) 
         {
@@ -167,6 +178,23 @@ namespace SportsWeek.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-
+        //make winner id 0 so that front end show that match is being played
+        [HttpPut]
+        public HttpResponseMessage startMatch(int fixtureId) 
+        {
+            try 
+            {
+                var fixture = db.Fixtures.Where(s=>s.id == fixtureId).FirstOrDefault();
+                if (fixture.winner_id == null) {
+                    fixture.winner_id = 0;
+                }
+                db.SaveChanges();
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex) 
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
+            }
+        }
     }
 }
