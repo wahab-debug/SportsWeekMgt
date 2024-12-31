@@ -19,6 +19,7 @@ namespace SportsWeek.Controllers
             {
                 // Retrieve the sport object based on the sport name
                 var sport = db.Sports.FirstOrDefault(s => s.game == sportName);
+                var latestSession = db.Sessions.OrderByDescending(s => s.end_date).FirstOrDefault();
                 if (sport == null)
                 {
                     return Request.CreateResponse(HttpStatusCode.NotFound, "Sport not found.");
@@ -33,7 +34,7 @@ namespace SportsWeek.Controllers
                 from t2 in t2Teams.DefaultIfEmpty()
                 join ss in db.SessionSports on f.sessionSport_id equals ss.id
                 join s in db.Sports on ss.sports_id equals s.id
-                where s.game == sportName
+                where s.game == sportName 
                 select new
                 {
                     fixture_id = f.id,

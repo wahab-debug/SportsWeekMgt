@@ -17,7 +17,7 @@ namespace SportsWeek.Models
         public int id { get; set; }
         public int team_id { get; set; }
         public int score { get; set; }
-        public string overs { get; set; }
+        public double overs { get; set; }
         public int wickets { get; set; }
         public int fixture_id { get; set; }
     

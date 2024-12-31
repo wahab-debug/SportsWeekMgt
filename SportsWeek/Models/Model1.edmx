@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="SportsWeekdbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="SportsWeekdbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Comments">
           <Key>
             <PropertyRef Name="id" />
@@ -20,7 +20,7 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="team_id" Type="int" Nullable="false" />
           <Property Name="score" Type="int" Nullable="false" />
-          <Property Name="overs" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="overs" Type="float" Nullable="false" />
           <Property Name="wickets" Type="int" Nullable="false" />
           <Property Name="fixture_id" Type="int" Nullable="false" />
         </EntityType>
@@ -44,6 +44,8 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="fixtures_id" Type="int" Nullable="false" />
           <Property Name="image_path" Type="varchar(max)" />
+          <Property Name="image_time" Type="datetime" />
+          <Property Name="event_id" Type="int" />
         </EntityType>
         <EntityType Name="GoalBaseScore">
           <Key>
@@ -66,6 +68,7 @@
           <Property Name="sessionSport_id" Type="int" />
           <Property Name="player_id" Type="int" />
           <Property Name="secondary_player_id" Type="int" />
+          <Property Name="fielder_id" Type="int" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -118,6 +121,7 @@
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="game" Type="varchar" MaxLength="30" />
           <Property Name="game_type" Type="varchar" MaxLength="30" />
+          <Property Name="scoring_type" Type="varchar" MaxLength="30" />
         </EntityType>
         <EntityType Name="Student">
           <Key>
@@ -128,6 +132,7 @@
           <Property Name="discipline" Type="varchar" MaxLength="10" />
           <Property Name="semeno" Type="int" />
           <Property Name="section" Type="char" MaxLength="1" />
+          <Property Name="gender" Type="char" MaxLength="1" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -303,6 +308,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_FixturesImages_Match_Events">
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="0..1" />
+          <End Role="FixturesImages" Type="Self.FixturesImages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Match_Events">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="FixturesImages">
+              <PropertyRef Name="event_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_GoalBaseScore_Fixtures">
           <End Role="Fixtures" Type="Self.Fixtures" Multiplicity="1" />
           <End Role="GoalBaseScore" Type="Self.GoalBaseScore" Multiplicity="*" />
@@ -324,6 +341,18 @@
             </Principal>
             <Dependent Role="GoalBaseScore">
               <PropertyRef Name="team_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Match_Events_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="fielder_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -557,6 +586,10 @@
             <End Role="Fixtures" EntitySet="Fixtures" />
             <End Role="FixturesImages" EntitySet="FixturesImages" />
           </AssociationSet>
+          <AssociationSet Name="FK_FixturesImages_Match_Events" Association="Self.FK_FixturesImages_Match_Events">
+            <End Role="Match_Events" EntitySet="Match_Events" />
+            <End Role="FixturesImages" EntitySet="FixturesImages" />
+          </AssociationSet>
           <AssociationSet Name="FK_GoalBaseScore_Fixtures" Association="Self.FK_GoalBaseScore_Fixtures">
             <End Role="Fixtures" EntitySet="Fixtures" />
             <End Role="GoalBaseScore" EntitySet="GoalBaseScore" />
@@ -564,6 +597,10 @@
           <AssociationSet Name="FK_GoalBaseScore_Teams" Association="Self.FK_GoalBaseScore_Teams">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="GoalBaseScore" EntitySet="GoalBaseScore" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Match_Events_Player" Association="Self.FK_Match_Events_Player">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
           </AssociationSet>
           <AssociationSet Name="FK_Player_Student" Association="Self.FK_Player_Student">
             <End Role="Student" EntitySet="Student" />
@@ -622,7 +659,8 @@
             <End Role="TurnBaseGames" EntitySet="TurnBaseGames" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="SportsWeekdbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -642,7 +680,7 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="team_id" Type="Int32" Nullable="false" />
           <Property Name="score" Type="Int32" Nullable="false" />
-          <Property Name="overs" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="overs" Type="Double" Nullable="false" />
           <Property Name="wickets" Type="Int32" Nullable="false" />
           <Property Name="fixture_id" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Fixture" Relationship="Self.FK_CricketScore_Fixtures" FromRole="CricketScore" ToRole="Fixtures" />
@@ -678,7 +716,10 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="fixtures_id" Type="Int32" Nullable="false" />
           <Property Name="image_path" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="image_time" Type="DateTime" Precision="3" />
+          <Property Name="event_id" Type="Int32" />
           <NavigationProperty Name="Fixture" Relationship="Self.FK_FixturesImages_Fixtures" FromRole="FixturesImages" ToRole="Fixtures" />
+          <NavigationProperty Name="Match_Events" Relationship="Self.FK_FixturesImages_Match_Events" FromRole="FixturesImages" ToRole="Match_Events" />
         </EntityType>
         <EntityType Name="GoalBaseScore">
           <Key>
@@ -703,10 +744,13 @@
           <Property Name="sessionSport_id" Type="Int32" />
           <Property Name="player_id" Type="Int32" />
           <Property Name="secondary_player_id" Type="Int32" />
+          <Property Name="fielder_id" Type="Int32" />
           <NavigationProperty Name="Fixture" Relationship="Self.FK__Match_Eve__fixtu__42ACE4D4" FromRole="Match_Events" ToRole="Fixtures" />
+          <NavigationProperty Name="FixturesImages" Relationship="Self.FK_FixturesImages_Match_Events" FromRole="Match_Events" ToRole="FixturesImages" />
           <NavigationProperty Name="Player" Relationship="Self.FK__Match_Eve__playe__43A1090D" FromRole="Match_Events" ToRole="Player" />
           <NavigationProperty Name="Player1" Relationship="Self.FK__Match_Eve__secon__44952D46" FromRole="Match_Events" ToRole="Player" />
           <NavigationProperty Name="SessionSport" Relationship="Self.FK__Match_Eve__sessi__4589517F" FromRole="Match_Events" ToRole="SessionSports" />
+          <NavigationProperty Name="Player2" Relationship="Self.FK_Match_Events_Player" FromRole="Match_Events" ToRole="Player" />
         </EntityType>
         <EntityType Name="Player">
           <Key>
@@ -717,6 +761,7 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <NavigationProperty Name="Match_Events" Relationship="Self.FK__Match_Eve__playe__43A1090D" FromRole="Player" ToRole="Match_Events" />
           <NavigationProperty Name="Match_Events1" Relationship="Self.FK__Match_Eve__secon__44952D46" FromRole="Player" ToRole="Match_Events" />
+          <NavigationProperty Name="Match_Events2" Relationship="Self.FK_Match_Events_Player" FromRole="Player" ToRole="Match_Events" />
           <NavigationProperty Name="Student" Relationship="Self.FK_Player_Student" FromRole="Player" ToRole="Student" />
           <NavigationProperty Name="Team" Relationship="Self.FK_Player_Teams" FromRole="Player" ToRole="Teams" />
         </EntityType>
@@ -773,6 +818,7 @@
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="game" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <Property Name="game_type" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="scoring_type" Type="String" MaxLength="30" FixedLength="false" Unicode="false" />
           <NavigationProperty Name="Rules" Relationship="Self.FK_Rules_Sports" FromRole="Sports" ToRole="Rules" />
           <NavigationProperty Name="SessionSports" Relationship="Self.FK_SessionSports_Sports" FromRole="Sports" ToRole="SessionSports" />
           <NavigationProperty Name="Teams" Relationship="Self.FK_Teams_Sports" FromRole="Sports" ToRole="Teams" />
@@ -786,6 +832,7 @@
           <Property Name="discipline" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="semeno" Type="Int32" />
           <Property Name="section" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="gender" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
           <NavigationProperty Name="Players" Relationship="Self.FK_Player_Student" FromRole="Student" ToRole="Player" />
         </EntityType>
         <EntityType Name="sysdiagram">
@@ -978,6 +1025,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_FixturesImages_Match_Events">
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="0..1" />
+          <End Role="FixturesImages" Type="Self.FixturesImage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Match_Events">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="FixturesImages">
+              <PropertyRef Name="event_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_GoalBaseScore_Teams">
           <End Role="Teams" Type="Self.Team" Multiplicity="1" />
           <End Role="GoalBaseScore" Type="Self.GoalBaseScore" Multiplicity="*" />
@@ -1023,6 +1082,18 @@
             </Principal>
             <Dependent Role="Match_Events">
               <PropertyRef Name="sessionSport_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Match_Events_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="Match_Events" Type="Self.Match_Events" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="Match_Events">
+              <PropertyRef Name="fielder_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1232,6 +1303,10 @@
             <End Role="Fixtures" EntitySet="Fixtures" />
             <End Role="TurnBaseGames" EntitySet="TurnBaseGames" />
           </AssociationSet>
+          <AssociationSet Name="FK_FixturesImages_Match_Events" Association="Self.FK_FixturesImages_Match_Events">
+            <End Role="Match_Events" EntitySet="Match_Events" />
+            <End Role="FixturesImages" EntitySet="FixturesImages" />
+          </AssociationSet>
           <AssociationSet Name="FK_GoalBaseScore_Teams" Association="Self.FK_GoalBaseScore_Teams">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="GoalBaseScore" EntitySet="GoalBaseScores" />
@@ -1246,6 +1321,10 @@
           </AssociationSet>
           <AssociationSet Name="FK__Match_Eve__sessi__4589517F" Association="Self.FK__Match_Eve__sessi__4589517F">
             <End Role="SessionSports" EntitySet="SessionSports" />
+            <End Role="Match_Events" EntitySet="Match_Events" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Match_Events_Player" Association="Self.FK_Match_Events_Player">
+            <End Role="Player" EntitySet="Players" />
             <End Role="Match_Events" EntitySet="Match_Events" />
           </AssociationSet>
           <AssociationSet Name="FK_Player_Student" Association="Self.FK_Player_Student">
@@ -1344,6 +1423,8 @@
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="fixtures_id" ColumnName="fixtures_id" />
                 <ScalarProperty Name="image_path" ColumnName="image_path" />
+                <ScalarProperty Name="image_time" ColumnName="image_time" />
+                <ScalarProperty Name="event_id" ColumnName="event_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1368,6 +1449,7 @@
                 <ScalarProperty Name="sessionSport_id" ColumnName="sessionSport_id" />
                 <ScalarProperty Name="player_id" ColumnName="player_id" />
                 <ScalarProperty Name="secondary_player_id" ColumnName="secondary_player_id" />
+                <ScalarProperty Name="fielder_id" ColumnName="fielder_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1426,6 +1508,7 @@
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="game" ColumnName="game" />
                 <ScalarProperty Name="game_type" ColumnName="game_type" />
+                <ScalarProperty Name="scoring_type" ColumnName="scoring_type" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -1437,6 +1520,7 @@
                 <ScalarProperty Name="discipline" ColumnName="discipline" />
                 <ScalarProperty Name="semeno" ColumnName="semeno" />
                 <ScalarProperty Name="section" ColumnName="section" />
+                <ScalarProperty Name="gender" ColumnName="gender" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

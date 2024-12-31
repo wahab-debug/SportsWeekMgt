@@ -25,6 +25,7 @@ namespace SportsWeek.Models
         public int id { get; set; }
         public string game { get; set; }
         public string game_type { get; set; }
+        public string scoring_type { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Rule> Rules { get; set; }

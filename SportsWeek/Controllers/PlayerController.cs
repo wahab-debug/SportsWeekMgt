@@ -114,5 +114,58 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
             }
         }
+
+        [HttpGet]
+        public HttpResponseMessage getPlayerByTeamName(string teamName)
+        {
+            try
+            {
+                // Get the latest session
+                var latestSession = db.Sessions.OrderByDescending(s => s.end_date).FirstOrDefault();
+
+                // Find the team with the provided team name and the latest session id
+                var team = db.Teams
+                             .Where(t => t.Tname == teamName && t.session_id == latestSession.id)
+                             .FirstOrDefault();
+
+                if (team == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "Team not found");
+                }
+
+                // Get all the players in the team
+                var players = db.Players
+                                .Where(p => p.team_id == team.teamid)
+                                .Select(p => new
+                                {
+                                    p.reg_no,
+                                    p.id,
+                                    p.team_id
+                                })
+                                .ToList();
+
+                // Join Players with Students to get player names
+                var playersWithNames = (from p in players
+                                        join s in db.Students on p.reg_no equals s.reg_no
+                                        select new
+                                        {
+                                            name = s.name,
+                                            reg_no = p.reg_no,
+                                            id = p.id
+                                        }).ToList();
+
+                // Return the final list of players with their names, reg_no and id
+                return Request.CreateResponse(HttpStatusCode.OK, playersWithNames);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+
+
+
     }
+
 }

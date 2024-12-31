@@ -51,7 +51,31 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
             }
         }
+        [HttpGet]
+        public HttpResponseMessage viewRulesPerEM(int emid)
+        {
+            try
+            {
+                var session = db.SessionSports.Where(u => u.managed_by==emid).FirstOrDefault();
+                var sportRule = db.Rules.Where(r => r.sport_id == session.sports_id).Select(p => new 
+                {
+                    sport = p.Sport.game,
+                    rule_of_game = p.rule_of_game
+                });
+                var result = sportRule.ToList();
+/*                var gameRule = db.Rules.Where(e => e.sport_id == sportId).Select(s => new { s.rule_of_game }).FirstOrDefault();
+*/               
+                if (result == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, "no Rule for game yet");
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, result);
 
-
+            }
+            catch
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

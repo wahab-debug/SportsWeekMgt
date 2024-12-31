@@ -17,7 +17,10 @@ namespace SportsWeek.Models
         public int id { get; set; }
         public int fixtures_id { get; set; }
         public string image_path { get; set; }
+        public Nullable<System.DateTime> image_time { get; set; }
+        public Nullable<int> event_id { get; set; }
     
         public virtual Fixture Fixture { get; set; }
+        public virtual Match_Events Match_Events { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SportsWeek.Models;
+﻿using SportsWeek.DTOs;
+using SportsWeek.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,6 +135,275 @@ namespace SportsWeek.Controllers
             catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage AddOrUpdateCricketScore(CricketScoringDTO cric)
+        {
+            try
+            {
+                // Fetch team based on teamName
+                var team = db.Teams.FirstOrDefault(t => t.Tname == cric.TeamName);
+
+                if (team == null)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Team not found");
+                }
+
+                // Check if the fixture_id exists and if the team_id is part of the fixture
+                var fixture = db.Fixtures.FirstOrDefault(f => f.id == cric.FixtureId);
+
+                if (fixture == null)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Fixture not found");
+                }
+
+                if (fixture.team1_id != team.teamid && fixture.team2_id != team.teamid)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "The team is not part of the specified fixture");
+                }
+
+                // Check if the fixture_id already exists for the given team_id in the CricketScore table
+                var existingScore = db.CricketScores.FirstOrDefault(cs => cs.fixture_id == cric.FixtureId && cs.team_id == team.teamid);
+
+                if (existingScore != null)
+                {
+                    // Update existing record
+                    existingScore.score = cric.Score;
+                    existingScore.overs = cric.Over;
+                    existingScore.wickets = cric.Wickets;
+
+                    db.SaveChanges();
+                    return Request.CreateResponse(HttpStatusCode.OK, "Cricket Score updated successfully");
+                }
+                else
+                {
+                    // Insert new record
+                    var newCricketScore = new CricketScore
+                    {
+                        team_id = team.teamid,
+                        score = cric.Score,
+                        overs = cric.Over,
+                        wickets = cric.Wickets,
+                        fixture_id = cric.FixtureId
+                    };
+
+                    db.CricketScores.Add(newCricketScore);
+                    db.SaveChanges();
+
+                    return Request.CreateResponse(HttpStatusCode.OK, "Cricket Score added with ID " + newCricketScore.id);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage UpdateCricketWinner([FromBody] int fixtureId)
+        {
+            try
+            {
+                var fixture = db.Fixtures.FirstOrDefault(f => f.id == fixtureId);
+
+                var team1Score = db.CricketScores.FirstOrDefault(s => s.fixture_id == fixtureId && s.team_id == fixture.team1_id);
+                var team2Score = db.CricketScores.FirstOrDefault(s => s.fixture_id == fixtureId && s.team_id == fixture.team2_id);
+
+                if (team1Score == null || team2Score == null)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Scores for one or both teams not found.");
+                }
+
+                if (team1Score.score > team2Score.score)
+                {
+                    fixture.winner_id = fixture.team1_id;
+                }
+                else if (team2Score.score > team1Score.score)
+                {
+                    fixture.winner_id = fixture.team2_id;
+                }
+                else
+                {
+                    fixture.winner_id = null;
+                }
+
+                db.SaveChanges();
+
+                return Request.CreateResponse(HttpStatusCode.OK, "Winner ID updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "An unexpected error occurred: " + ex.Message);
+            }
+        }
+        //GoalBasedScoring
+
+        [HttpPost]
+        public HttpResponseMessage AddOrUpdateGoalBasedScore(GoalBaseDTO gbd)
+        {
+            try
+            {
+                var team = db.Teams.FirstOrDefault(t => t.Tname == gbd.teamName);
+                var fixture = db.Fixtures.FirstOrDefault(f => f.id == gbd.fixture_id);
+
+                if (fixture.team1_id != team.teamid && fixture.team2_id != team.teamid)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "The team is not part of the specified fixture");
+                }
+
+                var existingScore = db.GoalBaseScores.FirstOrDefault(cs => cs.fixture_id == gbd.fixture_id && cs.team_id == team.teamid);
+
+                if (existingScore != null)
+                {
+                    // Update existing record
+                    existingScore.goals = gbd.goals;
+
+                    db.SaveChanges();
+                    return Request.CreateResponse(HttpStatusCode.OK, "Score updated successfully");
+                }
+                else
+                {
+                    // Insert new record
+                    var newGoalBaseScore = new GoalBaseScore
+                    {
+                        team_id = team.teamid,
+                        goals = gbd.goals,
+                        fixture_id = gbd.fixture_id
+                    };
+
+                    db.GoalBaseScores.Add(newGoalBaseScore);
+                    db.SaveChanges();
+
+                    return Request.CreateResponse(HttpStatusCode.OK, "Cricket Score added with ID " + newGoalBaseScore.id);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        public HttpResponseMessage UpdateGoalBasedWinner([FromBody] int fixtureId)
+        {
+            try
+            {
+                var fixture = db.Fixtures.FirstOrDefault(f => f.id == fixtureId);
+
+                var team1Goals = db.GoalBaseScores.FirstOrDefault(s => s.fixture_id == fixtureId && s.team_id == fixture.team1_id);
+                var team2Goals = db.GoalBaseScores.FirstOrDefault(s => s.fixture_id == fixtureId && s.team_id == fixture.team2_id);
+
+                if (team1Goals == null || team2Goals == null)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Scores for one or both teams not found.");
+                }
+
+                if (team1Goals.goals > team2Goals.goals)
+                {
+                    fixture.winner_id = fixture.team1_id;
+                }
+                else if (team2Goals.goals > team2Goals.goals)
+                {
+                    fixture.winner_id = fixture.team2_id;
+                }
+                else
+                {
+                    fixture.winner_id = null;
+                }
+
+                db.SaveChanges();
+
+                return Request.CreateResponse(HttpStatusCode.OK, "Winner ID updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "An unexpected error occurred: " + ex.Message);
+            }
+        }
+
+        //PointBasedScoring
+        [HttpPost]
+        public HttpResponseMessage AddOrUpdatePointBasedScore(PointBaseDTO pbd)
+        {
+            try
+            {
+                var team = db.Teams.FirstOrDefault(t => t.Tname == pbd.teamName);
+                var fixture = db.Fixtures.FirstOrDefault(f => f.id == pbd.fixture_id);
+
+                if (fixture.team1_id != team.teamid && fixture.team2_id != team.teamid)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "The team is not part of the specified fixture");
+                }
+
+                var existingScore = db.PointsBaseScores.FirstOrDefault(cs => cs.fixture_id == pbd.fixture_id && cs.team_id == team.teamid);
+
+                if (existingScore != null)
+                {
+                    // Update existing record
+                    existingScore.setsWon = pbd.setsWon;
+
+                    db.SaveChanges();
+                    return Request.CreateResponse(HttpStatusCode.OK, "Score updated successfully");
+                }
+                else
+                {
+                    // Insert new record
+                    var newPointBaseScore = new PointsBaseScore
+                    {
+                        team_id = team.teamid,
+                        setsWon = pbd.setsWon,
+                        fixture_id = pbd.fixture_id
+                    };
+
+                    db.PointsBaseScores.Add(newPointBaseScore);
+                    db.SaveChanges();
+
+                    return Request.CreateResponse(HttpStatusCode.OK, "Score added with ID " + newPointBaseScore.team_id);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public HttpResponseMessage UpdatePointBasedWinner([FromBody]int fixtureId)
+        {
+            try
+            {
+                var fixture = db.Fixtures.FirstOrDefault(f => f.id == fixtureId);
+
+                var team1Sets = db.PointsBaseScores.FirstOrDefault(s => s.fixture_id == fixtureId && s.team_id == fixture.team1_id);
+                var team2Sets = db.PointsBaseScores.FirstOrDefault(s => s.fixture_id == fixtureId && s.team_id == fixture.team2_id);
+
+                if (team1Sets == null || team2Sets == null)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Scores for one or both teams not found.");
+                }
+
+                if (team1Sets.setsWon > team2Sets.setsWon)
+                {
+                    fixture.winner_id = fixture.team1_id;
+                }
+                else if (team2Sets.setsWon > team2Sets.setsWon)
+                {
+                    fixture.winner_id = fixture.team2_id;
+                }
+                else
+                {
+                    fixture.winner_id = null;
+                }
+
+                db.SaveChanges();
+
+                return Request.CreateResponse(HttpStatusCode.OK, "Winner ID updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "An unexpected error occurred: " + ex.Message);
             }
         }
     }
