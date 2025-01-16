@@ -95,6 +95,17 @@
           <Property Name="rule_of_game" Type="varchar(max)" />
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
         </EntityType>
+        <EntityType Name="scorecard">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="fixture_id" Type="int" />
+          <Property Name="team_id" Type="int" />
+          <Property Name="player_id" Type="int" />
+          <Property Name="score" Type="int" />
+          <Property Name="ball_consumed" Type="int" />
+        </EntityType>
         <EntityType Name="Sessions">
           <Key>
             <PropertyRef Name="id" />
@@ -156,6 +167,7 @@
           <Property Name="sport_id" Type="int" Nullable="false" />
           <Property Name="image_path" Type="varchar(max)" />
           <Property Name="teamStatus" Type="tinyint" Nullable="false" />
+          <Property Name="teamGender" Type="char" MaxLength="1" />
         </EntityType>
         <EntityType Name="TurnBaseGames">
           <Key>
@@ -416,6 +428,42 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_scorecard_Fixtures">
+          <End Role="Fixtures" Type="Self.Fixtures" Multiplicity="0..1" />
+          <End Role="scorecard" Type="Self.scorecard" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Fixtures">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scorecard">
+              <PropertyRef Name="fixture_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_scorecard_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="scorecard" Type="Self.scorecard" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scorecard">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_scorecard_Teams">
+          <End Role="Teams" Type="Self.Teams" Multiplicity="0..1" />
+          <End Role="scorecard" Type="Self.scorecard" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Teams">
+              <PropertyRef Name="teamid" />
+            </Principal>
+            <Dependent Role="scorecard">
+              <PropertyRef Name="team_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_SessionSports_Sessions">
           <End Role="Sessions" Type="Self.Sessions" Multiplicity="0..1" />
           <End Role="SessionSports" Type="Self.SessionSports" Multiplicity="*" />
@@ -534,6 +582,7 @@
           <EntitySet Name="Player" EntityType="Self.Player" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PointsBaseScore" EntityType="Self.PointsBaseScore" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Rules" EntityType="Self.Rules" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="scorecard" EntityType="Self.scorecard" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sessions" EntityType="Self.Sessions" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SessionSports" EntityType="Self.SessionSports" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Sports" EntityType="Self.Sports" Schema="dbo" store:Type="Tables" />
@@ -622,6 +671,18 @@
             <End Role="Sports" EntitySet="Sports" />
             <End Role="Rules" EntitySet="Rules" />
           </AssociationSet>
+          <AssociationSet Name="FK_scorecard_Fixtures" Association="Self.FK_scorecard_Fixtures">
+            <End Role="Fixtures" EntitySet="Fixtures" />
+            <End Role="scorecard" EntitySet="scorecard" />
+          </AssociationSet>
+          <AssociationSet Name="FK_scorecard_Player" Association="Self.FK_scorecard_Player">
+            <End Role="Player" EntitySet="Player" />
+            <End Role="scorecard" EntitySet="scorecard" />
+          </AssociationSet>
+          <AssociationSet Name="FK_scorecard_Teams" Association="Self.FK_scorecard_Teams">
+            <End Role="Teams" EntitySet="Teams" />
+            <End Role="scorecard" EntitySet="scorecard" />
+          </AssociationSet>
           <AssociationSet Name="FK_SessionSports_Sessions" Association="Self.FK_SessionSports_Sessions">
             <End Role="Sessions" EntitySet="Sessions" />
             <End Role="SessionSports" EntitySet="SessionSports" />
@@ -707,6 +768,7 @@
           <NavigationProperty Name="FixturesImages" Relationship="Self.FK_FixturesImages_Fixtures" FromRole="Fixtures" ToRole="FixturesImages" />
           <NavigationProperty Name="GoalBaseScores" Relationship="Self.FK_GoalBaseScore_Fixtures" FromRole="Fixtures" ToRole="GoalBaseScore" />
           <NavigationProperty Name="PointsBaseScores" Relationship="Self.FK_PointsBaseScore_Fixtures" FromRole="Fixtures" ToRole="PointsBaseScore" />
+          <NavigationProperty Name="scorecards" Relationship="Self.FK_scorecard_Fixtures" FromRole="Fixtures" ToRole="scorecard" />
           <NavigationProperty Name="TurnBaseGames" Relationship="Self.FK_TurnBaseGames_Fixtures" FromRole="Fixtures" ToRole="TurnBaseGames" />
         </EntityType>
         <EntityType Name="FixturesImage">
@@ -764,6 +826,7 @@
           <NavigationProperty Name="Match_Events2" Relationship="Self.FK_Match_Events_Player" FromRole="Player" ToRole="Match_Events" />
           <NavigationProperty Name="Student" Relationship="Self.FK_Player_Student" FromRole="Player" ToRole="Student" />
           <NavigationProperty Name="Team" Relationship="Self.FK_Player_Teams" FromRole="Player" ToRole="Teams" />
+          <NavigationProperty Name="scorecards" Relationship="Self.FK_scorecard_Player" FromRole="Player" ToRole="scorecard" />
         </EntityType>
         <EntityType Name="PointsBaseScore">
           <Key>
@@ -784,6 +847,20 @@
           <Property Name="rule_of_game" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <NavigationProperty Name="Sport" Relationship="Self.FK_Rules_Sports" FromRole="Rules" ToRole="Sports" />
+        </EntityType>
+        <EntityType Name="scorecard">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="fixture_id" Type="Int32" />
+          <Property Name="team_id" Type="Int32" />
+          <Property Name="player_id" Type="Int32" />
+          <Property Name="score" Type="Int32" />
+          <Property Name="ball_consumed" Type="Int32" />
+          <NavigationProperty Name="Fixture" Relationship="Self.FK_scorecard_Fixtures" FromRole="scorecard" ToRole="Fixtures" />
+          <NavigationProperty Name="Player" Relationship="Self.FK_scorecard_Player" FromRole="scorecard" ToRole="Player" />
+          <NavigationProperty Name="Team" Relationship="Self.FK_scorecard_Teams" FromRole="scorecard" ToRole="Teams" />
         </EntityType>
         <EntityType Name="Session">
           <Key>
@@ -857,12 +934,14 @@
           <Property Name="sport_id" Type="Int32" Nullable="false" />
           <Property Name="image_path" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="teamStatus" Type="Byte" Nullable="false" />
+          <Property Name="teamGender" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
           <NavigationProperty Name="CricketScores" Relationship="Self.FK_CricketScore_Teams" FromRole="Teams" ToRole="CricketScore" />
           <NavigationProperty Name="Fixtures" Relationship="Self.FK_Fixtures_Teams" FromRole="Teams" ToRole="Fixtures" />
           <NavigationProperty Name="Fixtures1" Relationship="Self.FK_Fixtures_Teams1" FromRole="Teams" ToRole="Fixtures" />
           <NavigationProperty Name="GoalBaseScores" Relationship="Self.FK_GoalBaseScore_Teams" FromRole="Teams" ToRole="GoalBaseScore" />
           <NavigationProperty Name="Players" Relationship="Self.FK_Player_Teams" FromRole="Teams" ToRole="Player" />
           <NavigationProperty Name="PointsBaseScores" Relationship="Self.FK_PointsBaseScore_Teams" FromRole="Teams" ToRole="PointsBaseScore" />
+          <NavigationProperty Name="scorecards" Relationship="Self.FK_scorecard_Teams" FromRole="Teams" ToRole="scorecard" />
           <NavigationProperty Name="Session" Relationship="Self.FK_Teams_Sessions" FromRole="Teams" ToRole="Sessions" />
           <NavigationProperty Name="Sport" Relationship="Self.FK_Teams_Sports" FromRole="Teams" ToRole="Sports" />
           <NavigationProperty Name="User" Relationship="Self.FK_Teams_Users" FromRole="Teams" ToRole="Users" />
@@ -1013,6 +1092,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_scorecard_Fixtures">
+          <End Role="Fixtures" Type="Self.Fixture" Multiplicity="0..1" />
+          <End Role="scorecard" Type="Self.scorecard" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Fixtures">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scorecard">
+              <PropertyRef Name="fixture_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_TurnBaseGames_Fixtures">
           <End Role="Fixtures" Type="Self.Fixture" Multiplicity="1" />
           <End Role="TurnBaseGames" Type="Self.TurnBaseGame" Multiplicity="*" />
@@ -1121,6 +1212,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_scorecard_Player">
+          <End Role="Player" Type="Self.Player" Multiplicity="0..1" />
+          <End Role="scorecard" Type="Self.scorecard" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Player">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scorecard">
+              <PropertyRef Name="player_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_PointsBaseScore_Teams">
           <End Role="Teams" Type="Self.Team" Multiplicity="1" />
           <End Role="PointsBaseScore" Type="Self.PointsBaseScore" Multiplicity="*" />
@@ -1142,6 +1245,18 @@
             </Principal>
             <Dependent Role="Rules">
               <PropertyRef Name="sport_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_scorecard_Teams">
+          <End Role="Teams" Type="Self.Team" Multiplicity="0..1" />
+          <End Role="scorecard" Type="Self.scorecard" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Teams">
+              <PropertyRef Name="teamid" />
+            </Principal>
+            <Dependent Role="scorecard">
+              <PropertyRef Name="team_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1251,6 +1366,7 @@
           <EntitySet Name="Players" EntityType="Self.Player" />
           <EntitySet Name="PointsBaseScores" EntityType="Self.PointsBaseScore" />
           <EntitySet Name="Rules" EntityType="Self.Rule" />
+          <EntitySet Name="scorecards" EntityType="Self.scorecard" />
           <EntitySet Name="Sessions" EntityType="Self.Session" />
           <EntitySet Name="SessionSports" EntityType="Self.SessionSport" />
           <EntitySet Name="Sports" EntityType="Self.Sport" />
@@ -1299,6 +1415,10 @@
             <End Role="Fixtures" EntitySet="Fixtures" />
             <End Role="PointsBaseScore" EntitySet="PointsBaseScores" />
           </AssociationSet>
+          <AssociationSet Name="FK_scorecard_Fixtures" Association="Self.FK_scorecard_Fixtures">
+            <End Role="Fixtures" EntitySet="Fixtures" />
+            <End Role="scorecard" EntitySet="scorecards" />
+          </AssociationSet>
           <AssociationSet Name="FK_TurnBaseGames_Fixtures" Association="Self.FK_TurnBaseGames_Fixtures">
             <End Role="Fixtures" EntitySet="Fixtures" />
             <End Role="TurnBaseGames" EntitySet="TurnBaseGames" />
@@ -1335,6 +1455,10 @@
             <End Role="Teams" EntitySet="Teams" />
             <End Role="Player" EntitySet="Players" />
           </AssociationSet>
+          <AssociationSet Name="FK_scorecard_Player" Association="Self.FK_scorecard_Player">
+            <End Role="Player" EntitySet="Players" />
+            <End Role="scorecard" EntitySet="scorecards" />
+          </AssociationSet>
           <AssociationSet Name="FK_PointsBaseScore_Teams" Association="Self.FK_PointsBaseScore_Teams">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="PointsBaseScore" EntitySet="PointsBaseScores" />
@@ -1342,6 +1466,10 @@
           <AssociationSet Name="FK_Rules_Sports" Association="Self.FK_Rules_Sports">
             <End Role="Sports" EntitySet="Sports" />
             <End Role="Rules" EntitySet="Rules" />
+          </AssociationSet>
+          <AssociationSet Name="FK_scorecard_Teams" Association="Self.FK_scorecard_Teams">
+            <End Role="Teams" EntitySet="Teams" />
+            <End Role="scorecard" EntitySet="scorecards" />
           </AssociationSet>
           <AssociationSet Name="FK_SessionSports_Sessions" Association="Self.FK_SessionSports_Sessions">
             <End Role="Sessions" EntitySet="Sessions" />
@@ -1481,6 +1609,18 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="scorecards">
+            <EntityTypeMapping TypeName="SportsWeekdbModel.scorecard">
+              <MappingFragment StoreEntitySet="scorecard">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="fixture_id" ColumnName="fixture_id" />
+                <ScalarProperty Name="team_id" ColumnName="team_id" />
+                <ScalarProperty Name="player_id" ColumnName="player_id" />
+                <ScalarProperty Name="score" ColumnName="score" />
+                <ScalarProperty Name="ball_consumed" ColumnName="ball_consumed" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Sessions">
             <EntityTypeMapping TypeName="SportsWeekdbModel.Session">
               <MappingFragment StoreEntitySet="Sessions">
@@ -1546,6 +1686,7 @@
                 <ScalarProperty Name="sport_id" ColumnName="sport_id" />
                 <ScalarProperty Name="image_path" ColumnName="image_path" />
                 <ScalarProperty Name="teamStatus" ColumnName="teamStatus" />
+                <ScalarProperty Name="teamGender" ColumnName="teamGender" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

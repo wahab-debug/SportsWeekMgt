@@ -23,6 +23,7 @@ namespace SportsWeek.Models
             this.GoalBaseScores = new HashSet<GoalBaseScore>();
             this.Players = new HashSet<Player>();
             this.PointsBaseScores = new HashSet<PointsBaseScore>();
+            this.scorecards = new HashSet<scorecard>();
             this.TurnBaseGames = new HashSet<TurnBaseGame>();
             this.TurnBaseGames1 = new HashSet<TurnBaseGame>();
         }
@@ -35,6 +36,7 @@ namespace SportsWeek.Models
         public int sport_id { get; set; }
         public string image_path { get; set; }
         public byte teamStatus { get; set; }
+        public string teamGender { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CricketScore> CricketScores { get; set; }
@@ -48,6 +50,8 @@ namespace SportsWeek.Models
         public virtual ICollection<Player> Players { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PointsBaseScore> PointsBaseScores { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<scorecard> scorecards { get; set; }
         public virtual Session Session { get; set; }
         public virtual Sport Sport { get; set; }
         public virtual User User { get; set; }

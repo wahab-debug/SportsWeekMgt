@@ -40,6 +40,8 @@ namespace SportsWeek.Controllers
                     fixture_id = f.id,
                     team1_name = f.team1_id == null ? "Yet to Decide" : (t1 != null ? t1.Tname : "Yet to Decide"),
                     team2_name = f.team2_id == null ? "Yet to Decide" : (t2 != null ? t2.Tname : "Yet to Decide"),
+                    team1_id = f.team1_id,
+                    team2_id = f.team2_id,
                     matchDate = f.matchDate,
                     venue = f.venue,
                     winner_id = f.winner_id,

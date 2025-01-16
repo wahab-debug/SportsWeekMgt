@@ -112,7 +112,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, "An error occurred: " + ex.Message);
             }
         }
-
+       
         [HttpGet]
         public HttpResponseMessage GetImages(int fixturesId)
         {

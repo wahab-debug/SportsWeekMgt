@@ -1,4 +1,5 @@
-﻿using SportsWeek.DTOs;
+﻿using Microsoft.Ajax.Utilities;
+using SportsWeek.DTOs;
 using SportsWeek.Models;
 using System;
 using System.Collections.Generic;
@@ -238,6 +239,39 @@ namespace SportsWeek.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "An unexpected error occurred: " + ex.Message);
             }
         }
+
+        [HttpPost]
+        public HttpResponseMessage PostHighScorer(List<scorecard> cards)
+        {
+            try
+            {
+                if (cards == null || !cards.Any())
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);//, " Not Found Data"
+                }
+                foreach (var card in cards)
+                {
+                    var data = new scorecard
+                    {
+                        fixture_id = card.fixture_id,
+                        team_id = card.team_id,
+                        player_id = card.player_id,
+                        score = card.score,
+                        ball_consumed = card.ball_consumed,
+
+
+                    };
+                    db.scorecards.Add(data);
+                }
+                db.SaveChanges();
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+
+        }
         //GoalBasedScoring
 
         [HttpPost]
@@ -304,13 +338,13 @@ namespace SportsWeek.Controllers
                 {
                     fixture.winner_id = fixture.team1_id;
                 }
-                else if (team2Goals.goals > team2Goals.goals)
+                else if (team2Goals.goals > team1Goals.goals)
                 {
                     fixture.winner_id = fixture.team2_id;
                 }
                 else
                 {
-                    fixture.winner_id = null;
+                    fixture.winner_id = 0;
                 }
 
                 db.SaveChanges();
@@ -388,13 +422,13 @@ namespace SportsWeek.Controllers
                 {
                     fixture.winner_id = fixture.team1_id;
                 }
-                else if (team2Sets.setsWon > team2Sets.setsWon)
+                else if (team2Sets.setsWon > team1Sets.setsWon)
                 {
                     fixture.winner_id = fixture.team2_id;
                 }
                 else
                 {
-                    fixture.winner_id = null;
+                    fixture.winner_id = 0;
                 }
 
                 db.SaveChanges();

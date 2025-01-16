@@ -20,6 +20,7 @@ namespace SportsWeek.Models
             this.Match_Events = new HashSet<Match_Events>();
             this.Match_Events1 = new HashSet<Match_Events>();
             this.Match_Events2 = new HashSet<Match_Events>();
+            this.scorecards = new HashSet<scorecard>();
         }
     
         public string reg_no { get; set; }
@@ -34,5 +35,7 @@ namespace SportsWeek.Models
         public virtual ICollection<Match_Events> Match_Events2 { get; set; }
         public virtual Student Student { get; set; }
         public virtual Team Team { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<scorecard> scorecards { get; set; }
     }
 }

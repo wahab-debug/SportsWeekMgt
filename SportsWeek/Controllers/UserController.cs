@@ -39,6 +39,7 @@ namespace SportsWeek.Controllers
             try
             {
                 // Fetch the user with the given id from the database
+
                 var user = db.Users
                     .Where(u => u.registration_no == id)
                     .Select(u => new
@@ -66,7 +67,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-        //post a new user habndle registration
+        //post a new user handle registration
         [HttpPost]
         public HttpResponseMessage PostUser(User user)
         {
@@ -159,5 +160,19 @@ namespace SportsWeek.Controllers
             }
         }
 
+        [HttpGet]
+        public HttpResponseMessage HandleUser(int userId)
+        {
+            try 
+            {
+                var user = db.Users.FirstOrDefault(u=>u.id == userId);
+                var stdData = db.Students.Where(s=>s.reg_no==user.registration_no).Select(p=>p.gender  ).ToList();
+                return Request.CreateResponse(HttpStatusCode.OK, stdData);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

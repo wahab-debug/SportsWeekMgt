@@ -26,4 +26,5 @@ namespace SportsWeek.DTOs
         public int setsWon { get; set; }
         public int fixture_id { get; set; }
     }
+
 }

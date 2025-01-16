@@ -1,4 +1,5 @@
-﻿using SportsWeek.Models;
+﻿using SportsWeek.DTOs;
+using SportsWeek.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -38,7 +39,7 @@ namespace SportsWeek.Controllers
 
             }
         }
-        //get a specific team based on its id
+        //get a specific team details based on its team id
         [HttpGet]
         public HttpResponseMessage getByTeamId(int teamid) {
             try
@@ -66,27 +67,94 @@ namespace SportsWeek.Controllers
 
             }
         }
-        //add team to latest session and check if team name already exist
+        //add team to latest session and check if team name already exist ----- 9/1/2025-- new logic for team add
         [HttpPost]
-        public HttpResponseMessage postTeam(Team team) 
+        public HttpResponseMessage postTeam(TeamDTOs teamlist) 
         {
             try
             {
-                var latestSession = db.Sessions.OrderByDescending(s => s.end_date).FirstOrDefault();
-                var existingTeam = db.Teams.FirstOrDefault(t => t.Tname == team.Tname);
-                if (existingTeam != null) 
+                var latestSession = db.Sessions.OrderByDescending(s => s.start_date).FirstOrDefault();
+                if (latestSession == null || latestSession.start_date < DateTime.Now)
                 {
-                    return Request.CreateResponse(HttpStatusCode.Conflict);
+                    return Request.CreateResponse(HttpStatusCode.NotFound, new { errorcode = 1 });//, message = "No active session found." 
                 }
-                team.session_id = latestSession.id;
-                var query = db.Teams.Add(team);
-                db.SaveChanges();
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                // Check if the team name already exists in the session
+                if (db.Teams.Any(t => t.Tname == teamlist.Tname && t.session_id == latestSession.id))
+                {
+                    return Request.CreateResponse(HttpStatusCode.Conflict, new { errorcode = 3 });//, message = "Team with the same name already exists in this session."
+                }
+                //check if Caption exists in user table.
+                var user = db.Users.FirstOrDefault(u => u.id == teamlist.captain_id);
+                if (user == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, new { errorcode = 5 });//, message = "User not found." 
+                }
+                //check if the caption exists in student table.
+                var student = db.Students.FirstOrDefault(s => s.reg_no == user.registration_no);
+                if (student == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, new { errorcode = 6 });//, message = "Student not found."
+                }
 
+                var sport = db.Sports.FirstOrDefault(s => s.id == teamlist.sport_id);
+                if (sport == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, new { errorcode = 7 });//, message = "Sport not found." 
+                }
+
+                // Check if the user is already a captain in the latest session for the same sport
+                if (db.Teams.Any(t => t.captain_id == user.id && t.session_id == latestSession.id && t.sport_id == teamlist.sport_id))
+                {
+                    return Request.CreateResponse(HttpStatusCode.Conflict, new { errorcode = 4 });//, message = "User is already a captain of a team for the same sport in this session."
+                }
+                var maxTeamofSport = db.SessionSports.Where(s => s.sports_id == teamlist.sport_id).First();
+                //  ensure the number of teams for a given session does not exceed the predefined limit
+                if (db.Teams.Where(s => s.session_id == latestSession.id && s.sport_id==teamlist.sport_id).Count()>maxTeamofSport.no_of_teams)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Conflict, new { errorcode = 10 });//, message = "max team error when team are exceeded from max team limit"
+                }
+
+                // Create team
+                var newTeam = new Team
+                {
+                    Tname = teamlist.Tname,
+                    className = teamlist.className,
+                    captain_id = teamlist.captain_id,
+                    session_id = latestSession.id,
+                    sport_id = teamlist.sport_id,
+                    image_path = teamlist.Image_path,
+                    teamStatus = teamlist.teamStatus,
+                    teamGender = student.gender,
+                };
+
+                db.Teams.Add(newTeam);
+                db.SaveChanges();
+
+
+                // Add player data if SingleUser
+                if (teamlist.TeamType == "SingleUser")
+                {
+                    var player = new Player
+                    {
+                        reg_no = student.reg_no,
+                        team_id = newTeam.teamid
+                    };
+
+                    db.Players.Add(player);
+                    db.SaveChanges();
+                    return Request.CreateResponse(HttpStatusCode.Created);
+                }
+                var response = new
+                {
+                    newTeam.teamid,
+                };
+
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception ex)
+            {
+                // Log the error (logging mechanism not shown here)
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
         //update team name , class name , image and status of team
@@ -113,7 +181,7 @@ namespace SportsWeek.Controllers
 
             }
         }
-       //return list of teams for specific sport that is assigned to the manager
+       //return list of teams for specific sport that is assigned to the manager from latest session where role is "MOD" as well
         [HttpGet]
         public HttpResponseMessage AllTeamsByEM(string emRegNo)
         {
@@ -123,6 +191,7 @@ namespace SportsWeek.Controllers
                                  .Where(u => u.registration_no == emRegNo)
                                  .Select(u => u.id)
                                  .FirstOrDefault();
+                var latestSession = db.Sessions.OrderByDescending(s => s.start_date).FirstOrDefault();
 
                 if (emUserId == 0)
                 {
@@ -132,7 +201,7 @@ namespace SportsWeek.Controllers
                 var teams = (from team in db.Teams
                              join sessionSport in db.SessionSports on team.sport_id equals sessionSport.sports_id
                              join captain in db.Users on team.captain_id equals captain.id
-                             where sessionSport.managed_by == emUserId
+                             where sessionSport.managed_by == emUserId && sessionSport.session_id == latestSession.id
                              select new
                              {
                                  Tname = team.Tname,
@@ -217,6 +286,61 @@ namespace SportsWeek.Controllers
             catch (Exception ex) 
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
+            }
+        }
+        //gets name and id of teams that are playing match for a fixture id
+        [HttpGet]
+        public HttpResponseMessage playingTeams(int fixtureId) 
+        {
+            try
+            {
+                var fixture = db.Fixtures.Where(f => f.id == fixtureId).FirstOrDefault();
+
+                // Fetch team names for both teams
+                var team1name = db.Teams.Where(t1 => t1.teamid == fixture.team1_id).Select(t1 => new { t1.Tname, t1.teamid }).FirstOrDefault();
+                var team2name = db.Teams.Where(t2 => t2.teamid == fixture.team2_id).Select(t2 => new {t2.Tname, t2.teamid}).FirstOrDefault();
+
+                // Use DefaultIfEmpty to handle null values, setting a default value "No team" if the result is null
+                var result = new
+                {
+                    Team1 = team1name.Tname ?? "Team undecided",
+                    Team2 = team2name.Tname ?? "Team undecided",
+                    team1Id = team1name.teamid,
+                    team2Id = team2name.teamid
+                };
+
+                return Request.CreateResponse(HttpStatusCode.OK, result);
+            }
+            catch (Exception ex) 
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
+            }
+        }
+
+        //get all teams of a user that he applied for in latest session
+        [HttpGet]
+        public HttpResponseMessage getUserAppliedTeams(int userId) 
+        {
+            try 
+            {
+                var result = db.Teams
+                    .Where(p => p.captain_id == userId)
+                    .Join(db.Sports,
+                        team => team.sport_id,
+                        sport => sport.id,
+                        (team, sport) => new {
+                            Tname = team.Tname,
+                            teamStatus = team.teamStatus,
+                            image_path = team.image_path,
+                            className = team.className,
+                            sport = sport.game // Include sport name here
+                        })
+                    .ToList();
+                return Request.CreateResponse(HttpStatusCode.OK,result);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

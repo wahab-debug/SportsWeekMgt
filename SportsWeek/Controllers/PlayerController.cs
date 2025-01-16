@@ -102,11 +102,11 @@ namespace SportsWeek.Controllers
         }
         //get student list based on semester
         [HttpGet]
-        public HttpResponseMessage studentList(int semsec, string sec) 
+        public HttpResponseMessage studentList(int semsec, string sec, string descip, string Gender) 
         {
             try 
             {
-                var query = db.Students.Where(p => p.semeno == semsec && p.section==sec).Select(s => new { s.name, s.reg_no }).ToList();
+                var query = db.Students.Where(p => p.semeno == semsec && p.section==sec && p.discipline == descip && p.gender==Gender).Select(s => new { s.name, s.reg_no }).ToList();
                 return Request.CreateResponse(HttpStatusCode.OK,query);
             }
             catch (Exception ex) 
