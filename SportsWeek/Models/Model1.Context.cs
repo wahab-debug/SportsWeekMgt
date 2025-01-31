@@ -27,9 +27,12 @@ namespace SportsWeek.Models
     
         public virtual DbSet<Comment> Comments { get; set; }
         public virtual DbSet<CricketScore> CricketScores { get; set; }
+        public virtual DbSet<delivery> deliveries { get; set; }
+        public virtual DbSet<delivery_Image> delivery_Image { get; set; }
         public virtual DbSet<Fixture> Fixtures { get; set; }
         public virtual DbSet<FixturesImage> FixturesImages { get; set; }
         public virtual DbSet<GoalBaseScore> GoalBaseScores { get; set; }
+        public virtual DbSet<ManOfTheMatch> ManOfTheMatches { get; set; }
         public virtual DbSet<Match_Events> Match_Events { get; set; }
         public virtual DbSet<Player> Players { get; set; }
         public virtual DbSet<PointsBaseScore> PointsBaseScores { get; set; }

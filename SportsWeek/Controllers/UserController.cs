@@ -159,7 +159,7 @@ namespace SportsWeek.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
-
+        //get gender of user
         [HttpGet]
         public HttpResponseMessage HandleUser(int userId)
         {
@@ -172,6 +172,31 @@ namespace SportsWeek.Controllers
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        //get sport name
+        [HttpGet]
+        public HttpResponseMessage getEmSport(int id)
+        {
+
+            try
+            {
+                var em = db.Users.FirstOrDefault(v => v.id == id);
+
+                var sportcheck = db.SessionSports.FirstOrDefault(sc => sc.managed_by == em.id);
+
+                if (sportcheck == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "No Sport Assigned yet");
+                }
+
+                var emsport = db.Sports.FirstOrDefault(es => es.id == sportcheck.sports_id);
+                return Request.CreateResponse(HttpStatusCode.OK, emsport.game);
+
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

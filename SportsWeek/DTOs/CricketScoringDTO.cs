@@ -14,6 +14,25 @@ namespace SportsWeek.DTOs
         public int Wickets { get; set; }
         public int FixtureId { get; set; }
     }
+    public class CricketbnbScoringDTO
+    {
+        public int fixture_id { get; set; }
+        public int team_id { get; set; }
+        public int over_number { get; set; }
+        public int ball_number { get; set; }
+        public int runs_scored { get; set; }
+        public int striker_id { get; set; }
+        public int non_striker_id { get; set; }
+        public int bowler_id { get; set; }
+        public string extras { get; set; }
+        public int extra_runs { get; set; }
+        public string wicket_type { get; set; }
+        public int dismissed_player_id { get; set; }
+        public int fielder_id { get; set; }
+        public string image_Path { get; set; }
+
+
+    }
     public class GoalBaseDTO {
         public string teamName { get; set; }
         public int goals { get; set; } 

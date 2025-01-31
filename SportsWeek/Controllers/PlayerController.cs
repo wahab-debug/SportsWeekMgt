@@ -25,7 +25,8 @@ namespace SportsWeek.Controllers
                                  {
                                      reg_no = player.reg_no,
                                      teamName = team.Tname,
-                                     playerName = student.name
+                                     playerName = student.name,
+                                     playerId = player.id,
 
                                  };
                 var players = playerteam.ToList();

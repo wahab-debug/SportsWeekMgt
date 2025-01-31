@@ -19,10 +19,11 @@ namespace SportsWeek.Controllers
             {
                 var list = db.Sessions.Select(s => new 
                 {
+                    s.id,
                     s.name,
                     s.start_date,
                     s.end_date,
-                }).OrderByDescending(s =>s.start_date).ToList();
+                }).OrderByDescending(s =>s.end_date).ToList();
                 return Request.CreateResponse(HttpStatusCode.OK,list);
             }
             catch(Exception ex) 

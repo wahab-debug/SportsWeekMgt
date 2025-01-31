@@ -18,6 +18,7 @@ namespace SportsWeek.Models
         public Team()
         {
             this.CricketScores = new HashSet<CricketScore>();
+            this.deliveries = new HashSet<delivery>();
             this.Fixtures = new HashSet<Fixture>();
             this.Fixtures1 = new HashSet<Fixture>();
             this.GoalBaseScores = new HashSet<GoalBaseScore>();
@@ -40,6 +41,8 @@ namespace SportsWeek.Models
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CricketScore> CricketScores { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<delivery> deliveries { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Fixture> Fixtures { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

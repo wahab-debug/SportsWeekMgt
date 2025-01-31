@@ -15,7 +15,6 @@ namespace SportsWeek
             config.EnableCors(corsAttr);
 
 
-
             // Web API routes
             config.MapHttpAttributeRoutes();
 

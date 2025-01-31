@@ -199,5 +199,51 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError,ex.Message);
             }
         }
+
+        [HttpGet]
+        public HttpResponseMessage getMatchesbySessionSport(int sessionSportID)
+        {
+            try
+            {
+                var fixturesQuery =
+                from f in db.Fixtures
+                join t1 in db.Teams on f.team1_id equals t1.teamid into t1Teams
+                from t1 in t1Teams.DefaultIfEmpty()
+                join t2 in db.Teams on f.team2_id equals t2.teamid into t2Teams
+                from t2 in t2Teams.DefaultIfEmpty()
+                join ss in db.SessionSports on f.sessionSport_id equals ss.id
+                join s in db.Sports on ss.sports_id equals s.id
+                where ss.id == sessionSportID
+                select new
+                {
+                    fixture_id = f.id,
+                    team1_name = f.team1_id == null ? "Yet to Decide" : (t1 != null ? t1.Tname : "Yet to Decide"),
+                    team2_name = f.team2_id == null ? "Yet to Decide" : (t2 != null ? t2.Tname : "Yet to Decide"),
+                    team1_id = f.team1_id,
+                    team2_id = f.team2_id,
+                    matchDate = f.matchDate,
+                    venue = f.venue,
+                    winner_id = f.winner_id,
+                    match_type = f.match_type,
+                    sport_name = s.game,
+                    sport_type = s.game_type
+                };
+
+                // Execute the query and get the results
+                var results = fixturesQuery.ToList();
+                if (results.Count == 0) {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "No schedules found");
+                }
+
+                // Return the match list as a response
+                return Request.CreateResponse(HttpStatusCode.OK, results);
+            }
+            catch (Exception ex)
+            {
+                // Handle any unexpected errors
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, "An error occurred: " + ex.Message);
+            }
+        }
+
     }
 }

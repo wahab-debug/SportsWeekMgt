@@ -24,12 +24,13 @@ namespace SportsWeek.Controllers
                             where ss.start_date==latestSession.start_date
                             select new
                             {
-                                s.id,
-                                s.game,
-                                s.game_type,
-                                ss.name,
-                                ss.start_date,
-                                ss.end_date
+                                id = s.id,
+                                game = s.game,
+                                game_type = s.game_type,
+                                name = ss.name,
+                                start_date = ss.start_date,
+                                end_date = ss.end_date,
+                                sessionsportid = ssp.id
                             }).ToList();
                
                 return Request.CreateResponse(HttpStatusCode.OK, query);
@@ -101,6 +102,61 @@ namespace SportsWeek.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-        } 
+        }
+        //return type of sport for loading screen of scoring and scoreboard
+        [HttpGet]
+        public HttpResponseMessage getSportType(int matchid) {
+            try
+            {
+
+                var result = (from f in db.Fixtures
+                              join ss in db.SessionSports on f.sessionSport_id equals ss.id
+                              join s in db.Sports on ss.sports_id equals s.id
+                              where f.id == matchid
+                              select s.scoring_type ).FirstOrDefault();
+
+                if (result == null )
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, new { errorcode = 1 });
+                }
+
+                // Return the sport related to the match
+                return Request.CreateResponse(HttpStatusCode.OK, result);
+
+            }
+            catch (Exception ex) 
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        //take sessionid and return sports offered in that session
+        [HttpGet]
+        public HttpResponseMessage gamesBySessionID(int sessionId)
+        {
+            try
+            {
+                var query = (from ssp in db.SessionSports
+                             join s in db.Sports on ssp.sports_id equals s.id
+                             join ss in db.Sessions on ssp.session_id equals ss.id
+                             where ssp.session_id == sessionId
+                             select new
+                             {
+                                 id = s.id,
+                                 game = s.game,
+                                 game_type = s.game_type,
+                                 name = ss.name,
+                                 start_date = ss.start_date,
+                                 end_date = ss.end_date,
+                                 sessionsportid = ssp.id
+                             }).ToList();
+
+                return Request.CreateResponse(HttpStatusCode.OK, query);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
     }
 }

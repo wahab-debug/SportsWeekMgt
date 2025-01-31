@@ -19,9 +19,11 @@ namespace SportsWeek.Models
         {
             this.Comments = new HashSet<Comment>();
             this.CricketScores = new HashSet<CricketScore>();
+            this.deliveries = new HashSet<delivery>();
             this.Match_Events = new HashSet<Match_Events>();
             this.FixturesImages = new HashSet<FixturesImage>();
             this.GoalBaseScores = new HashSet<GoalBaseScore>();
+            this.ManOfTheMatches = new HashSet<ManOfTheMatch>();
             this.PointsBaseScores = new HashSet<PointsBaseScore>();
             this.scorecards = new HashSet<scorecard>();
             this.TurnBaseGames = new HashSet<TurnBaseGame>();
@@ -41,6 +43,8 @@ namespace SportsWeek.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CricketScore> CricketScores { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<delivery> deliveries { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Match_Events> Match_Events { get; set; }
         public virtual SessionSport SessionSport { get; set; }
         public virtual Team Team { get; set; }
@@ -49,6 +53,8 @@ namespace SportsWeek.Models
         public virtual ICollection<FixturesImage> FixturesImages { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<GoalBaseScore> GoalBaseScores { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ManOfTheMatch> ManOfTheMatches { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PointsBaseScore> PointsBaseScores { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
