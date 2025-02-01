@@ -65,7 +65,7 @@ namespace SportsWeek.Controllers
                                  where ss.session_id==sessionId && f.match_type == "final"
                                  select new
                                  {
-                                     essionSportId = ss.id,
+                                     sessionSportId = ss.id,
                                      sportName = sp.game,
                                      eventManager = u.name,
                                      winnerId = f.winner_id,  // Assuming Fixtures table has winner_id
