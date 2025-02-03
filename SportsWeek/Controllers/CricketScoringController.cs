@@ -2,6 +2,7 @@
 using SportsWeek.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -582,7 +583,83 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        [HttpGet]
+        public HttpResponseMessage ballByballData(int specificFixtureId)
+        {
+            try
+            {
+                var fixtureData = db.Fixtures
+                    .Where(f => f.id == specificFixtureId)
+                    .Select(f => new {
+                        Team1Id = f.team1_id,
+                        Team2Id = f.team2_id
+                    }).FirstOrDefault();
 
+                if (fixtureData == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "No fixtures found");
+                }
 
+                var allDeliveries = db.deliveries
+                    .Where(d => d.fixture_id == specificFixtureId)
+                    .OrderBy(d => d.over_number)
+                    .ThenBy(d => d.ball_number)
+                    .AsEnumerable()
+                    .Select(d => new
+                    {
+                        Delivery = d,
+                        Striker = db.Players.Where(p => p.id == d.striker_id)
+                                    .Join(db.Students, p => p.reg_no, s => s.reg_no, (p, s) => s.name)
+                                    .FirstOrDefault(),
+                        NonStriker = db.Players.Where(p => p.id == d.non_striker_id)
+                                    .Join(db.Students, p => p.reg_no, s => s.reg_no, (p, s) => s.name)
+                                    .FirstOrDefault(),
+                        Bowler = db.Players.Where(p => p.id == d.bowler_id)
+                                    .Join(db.Students, p => p.reg_no, s => s.reg_no, (p, s) => s.name)
+                                    .FirstOrDefault(),
+                        DismissedPlayer = db.Players.Where(p => p.id == d.dismissed_player_id)
+                                    .Join(db.Students, p => p.reg_no, s => s.reg_no, (p, s) => s.name)
+                                    .FirstOrDefault(),
+                        Fielder = db.Players.Where(p => p.id == d.fielder_id)
+                                    .Join(db.Students, p => p.reg_no, s => s.reg_no, (p, s) => s.name)
+                                    .FirstOrDefault()
+                    })
+                    .Select(x => new BallByBallDto
+                    {
+                        Over = (int)x.Delivery.over_number,
+                        Ball = (int)x.Delivery.ball_number,
+                        Striker = x.Striker ?? "Unknown",
+                        NonStriker = x.NonStriker ?? "Unknown",
+                        Bowler = x.Bowler ?? "Unknown",
+                        BatsmanRuns = (int)x.Delivery.runs_scored,
+                        ExtraRuns = (int)x.Delivery.extra_runs,
+                        ExtraType = x.Delivery.extras ?? "None",
+                        IsWicket = !string.IsNullOrEmpty(x.Delivery.wicket_type),
+                        WicketType = x.Delivery.wicket_type ?? "None",
+                        DismissedPlayer = x.DismissedPlayer ?? "None",
+                        Fielder = x.Fielder ?? "None",
+                        TeamId = (int)x.Delivery.team_id
+                    }).ToList();
+                var team1data = allDeliveries
+                    .Where(d => d.TeamId == fixtureData.Team1Id)
+                    .ToList();
+
+                var team2data = allDeliveries
+                    .Where(d => d.TeamId == fixtureData.Team2Id)
+                    .ToList();
+
+                var result = new
+                {
+                    team1 = team1data,
+                    team2 = team2data
+                };
+
+                return Request.CreateResponse(HttpStatusCode.OK, result);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

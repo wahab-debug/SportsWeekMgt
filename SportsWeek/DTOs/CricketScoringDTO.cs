@@ -46,4 +46,21 @@ namespace SportsWeek.DTOs
         public int fixture_id { get; set; }
     }
 
+    // DTO class
+    public class BallByBallDto
+    {
+        public int Over { get; set; }
+        public int Ball { get; set; }
+        public string Striker { get; set; }
+        public string NonStriker { get; set; }
+        public string Bowler { get; set; }
+        public int BatsmanRuns { get; set; }
+        public int ExtraRuns { get; set; }
+        public string ExtraType { get; set; }
+        public bool IsWicket { get; set; }
+        public string WicketType { get; set; }
+        public string DismissedPlayer { get; set; }
+        public string Fielder { get; set; }
+        public int TeamId { get; set; } // Internal use only
+    }
 }
