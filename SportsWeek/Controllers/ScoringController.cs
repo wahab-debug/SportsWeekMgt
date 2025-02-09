@@ -67,7 +67,7 @@ namespace SportsWeek.Controllers
                     }
 
                     // Check if there's cricket scoring data for this fixture (e.g., cricket)
-                    var cricketScore = db.CricketScores
+/*                    var cricketScore = db.CricketScores
                                          .Where(c => c.fixture_id == matchId)
                                          .Select(c => new
                                          {
@@ -84,7 +84,7 @@ namespace SportsWeek.Controllers
                             Type = "Cricket Scoring",
                             Score = cricketScore
                         });
-                    }
+                    }*/
 
                     // Check if there's point-based scoring data for this fixture (e.g., tennis, volleyball)
                     var pointScore = db.PointsBaseScores
@@ -103,12 +103,19 @@ namespace SportsWeek.Controllers
                             Score = pointScore
                         });
                     }
-                    var TurnScore = db.TurnBaseGames
+                   /* var TurnScore = db.TurnBaseGames
                                        .Where(p => p.fixture_id == matchId)
                                        .Select(p => new
                                        {
-                                           WinnerId = p.winner_id,
-                                           LoserId = p.loser_id,
+                                           teamId = p.team_id,
+                                           rating = p.rating_adjustment,
+                                       }).ToList();*/
+                    var TurnScore = db.Fixtures
+                                       .Where(p => p.id == matchId)
+                                       .Select(p => new
+                                       {
+                                           winner_Id = p.winner_id,
+
                                        }).ToList();
 
                     if (TurnScore.Any())
@@ -141,7 +148,7 @@ namespace SportsWeek.Controllers
             }
         }
 
-        [HttpPost]
+       /* [HttpPost]
         public HttpResponseMessage AddOrUpdateCricketScore(CricketScoringDTO cric)
         {
             try
@@ -202,7 +209,7 @@ namespace SportsWeek.Controllers
             {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
-        }
+        }*/
 
         [HttpPost]
         public HttpResponseMessage UpdateCricketWinner([FromBody] int fixtureId)
@@ -261,8 +268,8 @@ namespace SportsWeek.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "An unexpected error occurred: " + ex.Message);
             }
         }
-/*
-        [HttpPost]
+
+        /*[HttpPost]
         public HttpResponseMessage PostHighScorer(List<scorecard> cards)
         {
             try
@@ -294,6 +301,7 @@ namespace SportsWeek.Controllers
             }
 
         }*/
+
         //GoalBasedScoring
 
         [HttpPost]
@@ -301,7 +309,7 @@ namespace SportsWeek.Controllers
         {
             try
             {
-                var team = db.Teams.FirstOrDefault(t => t.Tname == gbd.teamName);
+                var team = db.Teams.FirstOrDefault(t => t.teamid == gbd.teamid);
                 var fixture = db.Fixtures.FirstOrDefault(f => f.id == gbd.fixture_id);
 
                 if (fixture.team1_id != team.teamid && fixture.team2_id != team.teamid)
@@ -463,121 +471,143 @@ namespace SportsWeek.Controllers
             }
         }
 
-
-        [HttpGet]
-        public HttpResponseMessage newMatchScores(int matchId)
+        [HttpPost]
+        public HttpResponseMessage UpdateTurnBasedWinner(TurnBaseDTO obj)
         {
             try
             {
-                // Fetch the fixture details by matchId
-                var fixture = db.Fixtures.FirstOrDefault(m => m.id == matchId);
-
-                if (fixture != null)
+                var fixture = db.Fixtures.FirstOrDefault(f => f.id == obj.fixture_id);
+                if (fixture.team1_id != null || fixture.team2_id != null)
                 {
-                    var team1 = db.Teams.FirstOrDefault(t => t.teamid == fixture.team1_id);
-                    var team2 = db.Teams.FirstOrDefault(t => t.teamid == fixture.team2_id);
-
-                    // Initialize a list to hold all match details and scores
-                    var matchDetails = new List<object>();
-
-                    // Add fixture details as the first item
-                    matchDetails.Add(new
-                    {
-                        FixtureId = fixture.id,
-                        Team1Id = fixture.team1_id,
-                        Team2Id = fixture.team2_id,
-                        MatchDate = fixture.matchDate,
-                        Venue = fixture.venue,
-                        Team1Name = team1 != null ? team1.Tname : "Team 1 not found",
-                        Team2Name = team2 != null ? team2.Tname : "Team 2 not found",
-                    });
-
-                    // Goal-Based Scoring
-                    var goalScore = db.GoalBaseScores
-                                      .Where(g => g.fixture_id == matchId)
-                                      .Select(g => new
-                                      {
-                                          TeamId = g.team_id,
-                                          g.goals
-                                      }).ToList();
-
-                    if (goalScore.Any())
-                    {
-                        matchDetails.Add(new
-                        {
-                            Type = "Goal-Based Scoring",
-                            Score = goalScore
-                        });
-                    }
-
-                    // Cricket Scoring
-                    var cricketScore = db.CricketScores
-                                         .Where(c => c.fixture_id == matchId)
-                                         .Select(c => new
-                                         {
-                                             TeamId = c.team_id,
-                                             c.score,
-                                             c.overs,
-                                             c.wickets
-                                         }).ToList();
-
-                    if (cricketScore.Any())
-                    {
-                        matchDetails.Add(new
-                        {
-                            Type = "Cricket Scoring",
-                            Score = cricketScore
-                        });
-                    }
-
-                    // Point-Based Scoring
-                    var pointScore = db.PointsBaseScores
-                                       .Where(p => p.fixture_id == matchId)
-                                       .Select(p => new
-                                       {
-                                           TeamId = p.team_id,
-                                           p.setsWon
-                                       }).ToList();
-
-                    if (pointScore.Any())
-                    {
-                        matchDetails.Add(new
-                        {
-                            Type = "Point-Based Scoring",
-                            Score = pointScore
-                        });
-                    }
-
-                    // Turn-Based Scoring
-                    var turnScore = db.TurnBaseGames
-                                      .Where(t => t.fixture_id == matchId)
-                                      .Select(t => new
-                                      {
-                                          WinnerId = t.winner_id,
-                                          LoserId = t.loser_id,
-                                      }).ToList();
-
-                    if (turnScore.Any())
-                    {
-                        matchDetails.Add(new
-                        {
-                            Type = "Turn-Based Scoring",
-                            Score = turnScore
-                        });
-                    }
-
-                    // Return the match details and scores
-                    return Request.CreateResponse(HttpStatusCode.OK, matchDetails);
+                    fixture.winner_id = obj.winner_id;
                 }
-                else
+                else 
                 {
-                    return Request.CreateResponse(HttpStatusCode.NotFound, "Fixture not found.");
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Something missing in schedule");
                 }
+                db.SaveChanges();
+                return Request.CreateResponse(HttpStatusCode.OK, "Winner ID updated successfully.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "An unexpected error occurred: " + ex.Message);
             }
         }
+
+        /* [HttpGet]
+         public HttpResponseMessage newMatchScores(int matchId)
+         {
+             try
+             {
+                 // Fetch the fixture details by matchId
+                 var fixture = db.Fixtures.FirstOrDefault(m => m.id == matchId);
+
+                 if (fixture != null)
+                 {
+                     var team1 = db.Teams.FirstOrDefault(t => t.teamid == fixture.team1_id);
+                     var team2 = db.Teams.FirstOrDefault(t => t.teamid == fixture.team2_id);
+
+                     // Initialize a list to hold all match details and scores
+                     var matchDetails = new List<object>();
+
+                     // Add fixture details as the first item
+                     matchDetails.Add(new
+                     {
+                         FixtureId = fixture.id,
+                         Team1Id = fixture.team1_id,
+                         Team2Id = fixture.team2_id,
+                         MatchDate = fixture.matchDate,
+                         Venue = fixture.venue,
+                         Team1Name = team1 != null ? team1.Tname : "Team 1 not found",
+                         Team2Name = team2 != null ? team2.Tname : "Team 2 not found",
+                     });
+
+                     // Goal-Based Scoring
+                     var goalScore = db.GoalBaseScores
+                                       .Where(g => g.fixture_id == matchId)
+                                       .Select(g => new
+                                       {
+                                           TeamId = g.team_id,
+                                           g.goals
+                                       }).ToList();
+
+                     if (goalScore.Any())
+                     {
+                         matchDetails.Add(new
+                         {
+                             Type = "Goal-Based Scoring",
+                             Score = goalScore
+                         });
+                     }
+
+                     // Cricket Scoring
+                     var cricketScore = db.CricketScores
+                                          .Where(c => c.fixture_id == matchId)
+                                          .Select(c => new
+                                          {
+                                              TeamId = c.team_id,
+                                              c.score,
+                                              c.overs,
+                                              c.wickets
+                                          }).ToList();
+
+                     if (cricketScore.Any())
+                     {
+                         matchDetails.Add(new
+                         {
+                             Type = "Cricket Scoring",
+                             Score = cricketScore
+                         });
+                     }
+
+                     // Point-Based Scoring
+                     var pointScore = db.PointsBaseScores
+                                        .Where(p => p.fixture_id == matchId)
+                                        .Select(p => new
+                                        {
+                                            TeamId = p.team_id,
+                                            p.setsWon
+                                        }).ToList();
+
+                     if (pointScore.Any())
+                     {
+                         matchDetails.Add(new
+                         {
+                             Type = "Point-Based Scoring",
+                             Score = pointScore
+                         });
+                     }
+
+                     // Turn-Based Scoring
+                     var turnScore = db.TurnBaseGames
+                                       .Where(t => t.fixture_id == matchId)
+                                       .Select(t => new
+                                       {
+                                           WinnerId = t.winner_id,
+                                           LoserId = t.loser_id,
+                                       }).ToList();
+
+                     if (turnScore.Any())
+                     {
+                         matchDetails.Add(new
+                         {
+                             Type = "Turn-Based Scoring",
+                             Score = turnScore
+                         });
+                     }
+
+                     // Return the match details and scores
+                     return Request.CreateResponse(HttpStatusCode.OK, matchDetails);
+                 }
+                 else
+                 {
+                     return Request.CreateResponse(HttpStatusCode.NotFound, "Fixture not found.");
+                 }
+             }
+             catch (Exception e)
+             {
+                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+             }
+         }*/
     }
 }

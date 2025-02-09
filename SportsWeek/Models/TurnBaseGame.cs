@@ -16,11 +16,10 @@ namespace SportsWeek.Models
     {
         public int id { get; set; }
         public int fixture_id { get; set; }
-        public int winner_id { get; set; }
-        public int loser_id { get; set; }
+        public Nullable<int> team_id { get; set; }
+        public Nullable<int> rating_adjustment { get; set; }
     
         public virtual Fixture Fixture { get; set; }
         public virtual Team Team { get; set; }
-        public virtual Team Team1 { get; set; }
     }
 }

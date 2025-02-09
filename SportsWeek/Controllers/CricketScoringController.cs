@@ -218,7 +218,7 @@ namespace SportsWeek.Controllers
                     team1Total = team1Runs,
                     team2Total = team2Runs
                 };
-
+                var winnerId = db.Fixtures.FirstOrDefault(d => d.id == matchId);
                 var bowlingStatsResponse = bowlingStatsPerMatch(matchId);
                 var bowlingStatsResult = bowlingStatsResponse.Content.ReadAsAsync<object>().Result;
 
@@ -227,6 +227,7 @@ namespace SportsWeek.Controllers
                     PlayersScore = EachTeamIndividualScore,
                     RunwithExtra = EachTeamScore,
                     bowlingStats = bowlingStatsResult,
+                    winnerId = winnerId.winner_id
                 };
 
                 return Request.CreateResponse(HttpStatusCode.OK,results);
@@ -306,7 +307,7 @@ namespace SportsWeek.Controllers
                     })
                     .OrderByDescending(b => b.wickets)
                     .ThenBy(b => b.economyRate)
-                    .Take(10)
+                    .Take(3)
                     .ToList();
                 if (!result.Any())
                 {
@@ -364,7 +365,7 @@ namespace SportsWeek.Controllers
                                })
                                .OrderByDescending(p => p.totalRuns)
                                .ThenByDescending(p => p.strikeRate)
-                               .Take(10)
+                               .Take(3)
                                .ToList();
 
                 if (!result.Any())
@@ -479,7 +480,7 @@ namespace SportsWeek.Controllers
                         };
                     })
                     .OrderByDescending(p => (p.BattingRuns * 2) + (p.WicketsTaken * 25)) // Simple scoring logic
-                    .Take(10)
+                    .Take(3)
                     .ToList();
 
                 return Request.CreateResponse(HttpStatusCode.OK, result);
@@ -655,6 +656,68 @@ namespace SportsWeek.Controllers
                 };
 
                 return Request.CreateResponse(HttpStatusCode.OK, result);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public HttpResponseMessage GetImagePath(int fixid)
+        {
+            try
+            {
+                if (fixid < 0)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+                var MOMimagepath = db.ManOfTheMatches.
+                    Where(m => m.fixture_id == fixid)
+                    .Select(m => m.image_path)
+                    .FirstOrDefault();
+
+                var Deliveryimages =
+                   (from d in db.deliveries
+                    join dm in db.delivery_Image on d.id equals dm.delivery_id
+                    where d.fixture_id == fixid
+                    group d by new { dm.image_path, dm.delivery_id, d.runs_scored, d.wicket_type } into grouped
+                    select new
+                    {
+                        imagepath = grouped.Key.image_path,
+                        deliveriesid = grouped.Key.delivery_id,
+                        socre = grouped.Key.runs_scored.ToString(),
+                        wicket = grouped.Key.wicket_type
+                    }).ToList();
+
+                var playerDetails =
+                    (from p in db.Players
+                     join mm in db.ManOfTheMatches on p.id equals mm.player_id
+                     join s in db.Students on p.reg_no equals s.reg_no
+                     join d in db.deliveries on mm.fixture_id equals d.fixture_id
+                     where mm.fixture_id == fixid
+                     group new { p, d } by new { p.reg_no, studentregno = s.reg_no, s.name, s.section, s.semeno, s.discipline } into grouped
+                     select new
+                     {
+                         studentreg = grouped.Key.studentregno,
+                         name = grouped.Key.name,
+                         section = grouped.Key.section,
+                         semno = grouped.Key.semeno,
+                         discipline = grouped.Key.discipline,
+                         runsscored = grouped.Where(g => g.d.striker_id == g.p.id).Sum(g => g.d.runs_scored),
+                         wickets_taken = grouped.Count(g => g.d.bowler_id == g.p.id &&
+                          (g.d.wicket_type == "Bowled" ||
+                           g.d.wicket_type == "Caught" ||
+                           g.d.wicket_type == "Stumped" ||
+                           g.d.wicket_type == "Hit Wicket"))
+                     }).ToList();
+                if (playerDetails == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+                var data = new { MOMimagepath, playerDetails, Deliveryimages };
+
+                return Request.CreateResponse(HttpStatusCode.OK, data);
             }
             catch (Exception ex)
             {

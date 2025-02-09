@@ -107,7 +107,8 @@ namespace SportsWeek.Controllers
         {
             try 
             {
-                var query = db.Students.Where(p => p.semeno == semsec && p.section==sec && p.discipline == descip && p.gender==Gender).Select(s => new { s.name, s.reg_no }).ToList();
+                /*var query = db.Students.Where(p => p.semeno == semsec && p.section == sec && p.discipline == descip && p.gender == Gender).Select(s => new { s.name, s.reg_no }).ToList();*/
+                var query = db.Students.Where(p => p.semeno == semsec).Select(s => new { s.name, s.reg_no }).ToList();
                 return Request.CreateResponse(HttpStatusCode.OK,query);
             }
             catch (Exception ex) 

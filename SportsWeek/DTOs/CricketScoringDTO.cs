@@ -34,7 +34,7 @@ namespace SportsWeek.DTOs
 
     }
     public class GoalBaseDTO {
-        public string teamName { get; set; }
+        public int teamid { get; set; }
         public int goals { get; set; } 
         public int fixture_id { get; set; }
     }
@@ -44,6 +44,12 @@ namespace SportsWeek.DTOs
         public string teamName { get; set; }
         public int setsWon { get; set; }
         public int fixture_id { get; set; }
+    }
+    //turnbase dto
+    public class TurnBaseDTO 
+    {
+        public int fixture_id { get; set; }
+        public int winner_id { get; set; }
     }
 
     // DTO class

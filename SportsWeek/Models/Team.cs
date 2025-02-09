@@ -26,7 +26,6 @@ namespace SportsWeek.Models
             this.PointsBaseScores = new HashSet<PointsBaseScore>();
             this.scorecards = new HashSet<scorecard>();
             this.TurnBaseGames = new HashSet<TurnBaseGame>();
-            this.TurnBaseGames1 = new HashSet<TurnBaseGame>();
         }
     
         public int teamid { get; set; }
@@ -60,7 +59,5 @@ namespace SportsWeek.Models
         public virtual User User { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TurnBaseGame> TurnBaseGames { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<TurnBaseGame> TurnBaseGames1 { get; set; }
     }
 }

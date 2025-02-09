@@ -38,7 +38,7 @@ namespace SportsWeek.Controllers
                                          playerId = grouped.Key.player_id,
                                          PlayerName = grouped.Key.name,
                                          goalsScored = grouped.Count()
-                                     }).OrderByDescending(d=>d.goalsScored).Take(5).ToList();
+                                     }).OrderByDescending(d=>d.goalsScored).Take(3).ToList();
 
                 // Return the match list as a response
                 return Request.CreateResponse(HttpStatusCode.OK, TopGoalScorer);
@@ -74,6 +74,21 @@ namespace SportsWeek.Controllers
                                      loserName = f.winner_id == f.team1_id ? t2.Tname : t1.Tname
 
                                  }).ToList();
+                CricketScoringController controller = new CricketScoringController();
+                controller.ControllerContext = this.ControllerContext; // Fix: Share context
+                var topscorer = controller.topScorer(sessionId).Content.ReadAsAsync<object>().Result;
+                var besplayer = controller.BestPlayer(sessionId).Content.ReadAsAsync<object>().Result;
+                var wickettaker = controller.topWicketTaker(sessionId).Content.ReadAsAsync<object>().Result;
+                var topgoalscorerResponse = topPerformers(sessionId);
+                var topgoalscorer = topgoalscorerResponse.Content.ReadAsAsync<List<dynamic>>().Result;
+                var gist = new
+                {
+                    finalList = finalists,
+                    topScorer = topscorer,
+                    bestPlaye = besplayer,
+                    wicketTaker = wickettaker,
+                    goalScoere = topgoalscorer
+                };
 
                 // Step 2: Check if the result is found
                 if (finalists == null)
@@ -82,12 +97,160 @@ namespace SportsWeek.Controllers
                 }
 
                 // Step 3: Return the result
-                return Request.CreateResponse(HttpStatusCode.OK, finalists);
+                return Request.CreateResponse(HttpStatusCode.OK, gist);
             }
             catch (Exception ex)
             {
                 // Handle any exceptions that occur during processing
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        //not complete yet
+        [HttpGet]
+        public HttpResponseMessage GetPlayerPerformance(string regNo, int sessionId)
+        {
+            try
+            {
+                // 1. Look up the player by registration number.
+                var player = db.Players.FirstOrDefault(p => p.reg_no == regNo);
+                if (player == null)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Player not found.");
+                }
+
+                // 2. Get all sports in the given session.
+                //    (Assumes SessionSports has a navigation property to Sport.)
+                var sessionSports = db.SessionSports
+                                      .Include("Sport")
+                                      .Where(ss => ss.session_id == sessionId)
+                                      .ToList();
+
+                // This list will hold performance details for each sport
+                var performanceResults = new List<object>();
+
+                // 3. For each sport in the session check the scoring type and calculate the player’s performance.
+                foreach (var sessionSport in sessionSports)
+                {
+                    var sport = sessionSport.Sport;  // sport details from Sports table
+                                                     // Get all fixtures for this session sport.
+                    var fixtures = db.Fixtures
+                                     .Where(f => f.sessionSport_id == sessionSport.id)
+                                     .ToList();
+
+                    // This list will store match-by-match performance for the current sport.
+                    var matchPerformances = new List<object>();
+
+                    // Process based on the sport’s scoring type.
+                    if (sport.scoring_type == "Cricket")
+                    {
+                        // For cricket, we work with the deliveries table.
+                        foreach (var fixture in fixtures)
+                        {
+                            // Look for deliveries where the player was either batting (striker)
+                            // or bowling (bowler) in this fixture.
+                            var deliveries = db.deliveries
+                                               .Where(d => d.fixture_id == fixture.id &&
+                                                      (d.striker_id == player.id || d.bowler_id == player.id))
+                                               .ToList();
+                            // If no record exists for this match, then skip.
+                            if (!deliveries.Any())
+                                continue;
+
+                            // Sum runs only where the player was batting.
+                            int runs = deliveries
+                                        .Where(d => d.striker_id == player.id)
+                                        .Sum(d => d.runs_scored ?? 0);
+
+                            // Count wickets from deliveries where the player was bowling
+                            // and a wicket was recorded.
+                            int wickets = deliveries
+                                           .Where(d => d.bowler_id == player.id && !string.IsNullOrEmpty(d.wicket_type))
+                                           .Count();
+
+                            matchPerformances.Add(new
+                            {
+                                FixtureId = fixture.id,
+                                MatchDate = fixture.matchDate,
+                                Venue = fixture.venue,
+                                RunsScored = runs,
+                                WicketsTaken = wickets
+                            });
+                        }
+                    }
+                    else if (sport.scoring_type == "goalbase")
+                    {
+                        // For goal-based sports, we check the MatchEvents table for events of type "Goal".
+                        foreach (var fixture in fixtures)
+                        {
+                            var goalEvents = db.Match_Events
+                                               .Where(me => me.fixture_id == fixture.id &&
+                                                        me.player_id == player.id &&
+                                                        me.event_type == "Goal")
+                                               .ToList();
+
+                            // Skip fixture if the player did not record any events.
+                            if (!goalEvents.Any())
+                                continue;
+
+                            int goals = goalEvents.Count();
+
+                            matchPerformances.Add(new
+                            {
+                                FixtureId = fixture.id,
+                                MatchDate = fixture.matchDate,
+                                Venue = fixture.venue,
+                                GoalsScored = goals
+                            });
+                        }
+                    }
+                    else if (sport.scoring_type == "pointbase")
+                    {
+                        // For point-based sports, we check for events of type "Point-Scored".
+                        foreach (var fixture in fixtures)
+                        {
+                            var pointEvents = db.Match_Events
+                                                .Where(me => me.fixture_id == fixture.id &&
+                                                         me.player_id == player.id &&
+                                                         me.event_type == "Point Scored" || me.event_type== "Ace Serve")
+                                                .ToList();
+
+                            if (!pointEvents.Any())
+                                continue;
+
+                            // Here, we assume that each occurrence of a "Point-Scored" event
+                            // gives the player one point. If your design uses a different logic (for example,
+                            // storing the actual score in a field), adjust the aggregation accordingly.
+                            int points = pointEvents.Count();
+
+                            matchPerformances.Add(new
+                            {
+                                FixtureId = fixture.id,
+                                MatchDate = fixture.matchDate,
+                                Venue = fixture.venue,
+                                PointsScored = points
+                            });
+                        }
+                    }
+
+                    // Only add sports in which the player actually participated in one or more matches.
+                    if (matchPerformances.Any())
+                    {
+                        performanceResults.Add(new
+                        {
+                            SportId = sport.id,
+                            SportName = sport.game,
+                            ScoringType = sport.scoring_type,
+                            Matches = matchPerformances
+                        });
+                    }
+                }
+
+                // Return the aggregated performance details.
+                return Request.CreateResponse(HttpStatusCode.OK, performanceResults);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

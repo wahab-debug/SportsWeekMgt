@@ -211,8 +211,8 @@
           </Key>
           <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="fixture_id" Type="int" Nullable="false" />
-          <Property Name="winner_id" Type="int" Nullable="false" />
-          <Property Name="loser_id" Type="int" Nullable="false" />
+          <Property Name="team_id" Type="int" />
+          <Property Name="rating_adjustment" Type="int" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
@@ -692,27 +692,15 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_TurnBaseGames_Teams">
-          <End Role="Teams" Type="Self.Teams" Multiplicity="1" />
+        <Association Name="FK_TurnBaseGames_Teams2">
+          <End Role="Teams" Type="Self.Teams" Multiplicity="0..1" />
           <End Role="TurnBaseGames" Type="Self.TurnBaseGames" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Teams">
               <PropertyRef Name="teamid" />
             </Principal>
             <Dependent Role="TurnBaseGames">
-              <PropertyRef Name="winner_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_TurnBaseGames_Teams1">
-          <End Role="Teams" Type="Self.Teams" Multiplicity="1" />
-          <End Role="TurnBaseGames" Type="Self.TurnBaseGames" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Teams">
-              <PropertyRef Name="teamid" />
-            </Principal>
-            <Dependent Role="TurnBaseGames">
-              <PropertyRef Name="loser_id" />
+              <PropertyRef Name="team_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -894,11 +882,7 @@
             <End Role="Fixtures" EntitySet="Fixtures" />
             <End Role="TurnBaseGames" EntitySet="TurnBaseGames" />
           </AssociationSet>
-          <AssociationSet Name="FK_TurnBaseGames_Teams" Association="Self.FK_TurnBaseGames_Teams">
-            <End Role="Teams" EntitySet="Teams" />
-            <End Role="TurnBaseGames" EntitySet="TurnBaseGames" />
-          </AssociationSet>
-          <AssociationSet Name="FK_TurnBaseGames_Teams1" Association="Self.FK_TurnBaseGames_Teams1">
+          <AssociationSet Name="FK_TurnBaseGames_Teams2" Association="Self.FK_TurnBaseGames_Teams2">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="TurnBaseGames" EntitySet="TurnBaseGames" />
           </AssociationSet>
@@ -1182,8 +1166,7 @@
           <NavigationProperty Name="Session" Relationship="Self.FK_Teams_Sessions" FromRole="Teams" ToRole="Sessions" />
           <NavigationProperty Name="Sport" Relationship="Self.FK_Teams_Sports" FromRole="Teams" ToRole="Sports" />
           <NavigationProperty Name="User" Relationship="Self.FK_Teams_Users" FromRole="Teams" ToRole="Users" />
-          <NavigationProperty Name="TurnBaseGames" Relationship="Self.FK_TurnBaseGames_Teams" FromRole="Teams" ToRole="TurnBaseGames" />
-          <NavigationProperty Name="TurnBaseGames1" Relationship="Self.FK_TurnBaseGames_Teams1" FromRole="Teams" ToRole="TurnBaseGames" />
+          <NavigationProperty Name="TurnBaseGames" Relationship="Self.FK_TurnBaseGames_Teams2" FromRole="Teams" ToRole="TurnBaseGames" />
         </EntityType>
         <EntityType Name="TurnBaseGame">
           <Key>
@@ -1191,11 +1174,10 @@
           </Key>
           <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="fixture_id" Type="Int32" Nullable="false" />
-          <Property Name="winner_id" Type="Int32" Nullable="false" />
-          <Property Name="loser_id" Type="Int32" Nullable="false" />
+          <Property Name="team_id" Type="Int32" />
+          <Property Name="rating_adjustment" Type="Int32" />
           <NavigationProperty Name="Fixture" Relationship="Self.FK_TurnBaseGames_Fixtures" FromRole="TurnBaseGames" ToRole="Fixtures" />
-          <NavigationProperty Name="Team" Relationship="Self.FK_TurnBaseGames_Teams" FromRole="TurnBaseGames" ToRole="Teams" />
-          <NavigationProperty Name="Team1" Relationship="Self.FK_TurnBaseGames_Teams1" FromRole="TurnBaseGames" ToRole="Teams" />
+          <NavigationProperty Name="Team" Relationship="Self.FK_TurnBaseGames_Teams2" FromRole="TurnBaseGames" ToRole="Teams" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -1677,27 +1659,15 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_TurnBaseGames_Teams">
-          <End Role="Teams" Type="Self.Team" Multiplicity="1" />
+        <Association Name="FK_TurnBaseGames_Teams2">
+          <End Role="Teams" Type="Self.Team" Multiplicity="0..1" />
           <End Role="TurnBaseGames" Type="Self.TurnBaseGame" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Teams">
               <PropertyRef Name="teamid" />
             </Principal>
             <Dependent Role="TurnBaseGames">
-              <PropertyRef Name="winner_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_TurnBaseGames_Teams1">
-          <End Role="Teams" Type="Self.Team" Multiplicity="1" />
-          <End Role="TurnBaseGames" Type="Self.TurnBaseGame" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Teams">
-              <PropertyRef Name="teamid" />
-            </Principal>
-            <Dependent Role="TurnBaseGames">
-              <PropertyRef Name="loser_id" />
+              <PropertyRef Name="team_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1879,11 +1849,7 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="Teams" EntitySet="Teams" />
           </AssociationSet>
-          <AssociationSet Name="FK_TurnBaseGames_Teams" Association="Self.FK_TurnBaseGames_Teams">
-            <End Role="Teams" EntitySet="Teams" />
-            <End Role="TurnBaseGames" EntitySet="TurnBaseGames" />
-          </AssociationSet>
-          <AssociationSet Name="FK_TurnBaseGames_Teams1" Association="Self.FK_TurnBaseGames_Teams1">
+          <AssociationSet Name="FK_TurnBaseGames_Teams2" Association="Self.FK_TurnBaseGames_Teams2">
             <End Role="Teams" EntitySet="Teams" />
             <End Role="TurnBaseGames" EntitySet="TurnBaseGames" />
           </AssociationSet>
@@ -2118,8 +2084,8 @@
               <MappingFragment StoreEntitySet="TurnBaseGames">
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="fixture_id" ColumnName="fixture_id" />
-                <ScalarProperty Name="winner_id" ColumnName="winner_id" />
-                <ScalarProperty Name="loser_id" ColumnName="loser_id" />
+                <ScalarProperty Name="team_id" ColumnName="team_id" />
+                <ScalarProperty Name="rating_adjustment" ColumnName="rating_adjustment" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

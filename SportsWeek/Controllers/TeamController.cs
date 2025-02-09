@@ -343,5 +343,45 @@ namespace SportsWeek.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet]
+        public HttpResponseMessage AllWinnerTeamsByEM(string emRegNo)
+        {
+            try
+            {
+                var emUserId = db.Users
+                                 .Where(u => u.registration_no == emRegNo)
+                                 .Select(u => u.id)
+                                 .FirstOrDefault();
+                var latestSession = db.Sessions.OrderByDescending(s => s.start_date).FirstOrDefault();
+
+                if (emUserId == 0)
+                {
+                    return Request.CreateErrorResponse(HttpStatusCode.NotFound, "Event Manager not found.");
+                }
+
+                var teams = (from team in db.Teams
+                             join sessionSport in db.SessionSports on team.sport_id equals sessionSport.sports_id
+                             join captain in db.Users on team.captain_id equals captain.id
+                             where sessionSport.managed_by == emUserId && sessionSport.session_id == latestSession.id
+                             select new
+                             {
+                                 Tname = team.Tname,
+                                 captainRegNo = captain.registration_no,
+                                 image_path = team.image_path,
+                                 status = team.teamStatus,
+                                 teamid = team.teamid,
+                                 className = team.className
+                             }).Distinct().ToList();
+                var ssp = db.SessionSports.Where(d => d.managed_by == emUserId && d.session_id==latestSession.id).FirstOrDefault();
+                var winners = db.Fixtures.Where(d=>d.sessionSport_id==ssp.id && d.winner_id!=null).Select(p=>p.winner_id);
+
+                return Request.CreateResponse(HttpStatusCode.OK, winners);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }
