@@ -34,6 +34,7 @@ namespace SportsWeek.Models
         public virtual DbSet<GoalBaseScore> GoalBaseScores { get; set; }
         public virtual DbSet<ManOfTheMatch> ManOfTheMatches { get; set; }
         public virtual DbSet<Match_Events> Match_Events { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Player> Players { get; set; }
         public virtual DbSet<PointsBaseScore> PointsBaseScores { get; set; }
         public virtual DbSet<Rule> Rules { get; set; }

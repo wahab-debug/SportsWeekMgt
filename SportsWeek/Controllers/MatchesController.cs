@@ -340,5 +340,328 @@ namespace SportsWeek.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+        //not complete just first round
+        [HttpPost]
+        public HttpResponseMessage AutocreateFixtures(int userid, int sessionSportId, string venue)
+        {
+            try
+            {
+                if (userid < 0)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid user ID.");
+                }
+
+                // Retrieve the session sport managed by the user
+                var sessionSport = db.SessionSports.FirstOrDefault(s => s.id == sessionSportId && s.managed_by == userid);
+                if (sessionSport == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "Session sport not found or user is not authorized.");
+                }
+
+                // Get all teams under this session sport
+                var teams = db.Teams
+                    .Where(t => t.session_id == sessionSport.session_id && t.sport_id == sessionSport.sports_id)
+                    .ToList();
+                int teamCount = teams.Count;
+
+                // Validate team count
+                if (!new[] { 4, 8, 16, 32 }.Contains(teamCount))
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Fixtures can only be created for 4, 8, 16, or 32 teams.");
+                }
+
+                // Determine initial round configuration
+                string initialRound;
+                int expectedMatches;
+                switch (teamCount)
+                {
+                    case 4:
+                        initialRound = "Semi Final";
+                        expectedMatches = 2;
+                        break;
+                    case 8:
+                        initialRound = "Quarter Final";
+                        expectedMatches = 4;
+                        break;
+                    case 16:
+                        initialRound = "League Match 2";
+                        expectedMatches = 8;
+                        break;
+                    case 32:
+                        initialRound = "League Match";
+                        expectedMatches = 16;
+                        break;
+                    default:
+                        return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid team count.");
+                }
+
+                // Check if fixtures for this round already exist
+                var existingFixtures = db.Fixtures
+                    .Any(f => f.sessionSport_id == sessionSportId && f.match_type == initialRound);
+                if (existingFixtures)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Conflict, $"Fixtures for {initialRound} already exist.");
+                }
+
+                // Shuffle teams to randomize matchups
+                var shuffledTeams = teams.OrderBy(t => Guid.NewGuid()).ToList();
+
+                // Create fixtures for each pair of teams
+                for (int i = 0; i < expectedMatches; i++)
+                {
+                    int team1Index = i * 2;
+                    int team2Index = i * 2 + 1;
+
+                    var team1 = shuffledTeams[team1Index];
+                    var team2 = shuffledTeams[team2Index];
+
+                    Fixture fixture = new Fixture
+                    {
+                        team1_id = team1.teamid,
+                        team2_id = team2.teamid,
+                        match_type = initialRound,
+                        sessionSport_id = sessionSportId,
+                        matchDate = null,
+                        venue = venue,
+                        winner_id = null
+                    };
+
+                    db.Fixtures.Add(fixture);
+                }
+
+                db.SaveChanges();
+
+                return Request.CreateResponse(HttpStatusCode.OK, "Fixtures created successfully.");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        //complete create fixture automattically ithout time interval
+        [HttpPost]
+        public HttpResponseMessage AutocreateFixture(int userid, int sessionSportId, string venue)
+        {
+            try
+            {
+                if (userid < 0)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid user ID.");
+                }
+
+                // Verify user manages the session sport
+                var sessionSport = db.SessionSports.FirstOrDefault(s => s.id == sessionSportId && s.managed_by == userid);
+                if (sessionSport == null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "Session sport not found or unauthorized.");
+                }
+
+                // Get teams for the session sport
+                var teams = db.Teams
+                    .Where(t => t.session_id == sessionSport.session_id && t.sport_id == sessionSport.sports_id)
+                    .ToList();
+                int teamCount = teams.Count;
+
+                // Validate team count
+                if (!new[] { 4, 8, 16, 32 }.Contains(teamCount))
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Fixtures require 4, 8, 16, or 32 teams.");
+                }
+
+                // Define all rounds based on team count
+                List<(string RoundName, int Matches)> rounds = new List<(string, int)>();
+                switch (teamCount)
+                {
+                    case 4:
+                        rounds.Add(("Semi Final", 2));
+                        rounds.Add(("Final", 1));
+                        break;
+                    case 8:
+                        rounds.Add(("Quarter Final", 4));
+                        rounds.Add(("Semi Final", 2));
+                        rounds.Add(("Final", 1));
+                        break;
+                    case 16:
+                        rounds.Add(("League Match 2", 8));
+                        rounds.Add(("Quarter Final", 4));
+                        rounds.Add(("Semi Final", 2));
+                        rounds.Add(("Final", 1));
+                        break;
+                    case 32:
+                        rounds.Add(("League Match", 16));
+                        rounds.Add(("League Match 2", 8));
+                        rounds.Add(("Quarter Final", 4));
+                        rounds.Add(("Semi Final", 2));
+                        rounds.Add(("Final", 1));
+                        break;
+                }
+
+                // Check for existing fixtures in any of the rounds
+                var existingRoundNames = rounds.Select(r => r.RoundName).ToList();
+                bool hasExistingFixtures = db.Fixtures
+                    .Any(f => f.sessionSport_id == sessionSportId && existingRoundNames.Contains(f.match_type));
+                if (hasExistingFixtures)
+                {
+                    return Request.CreateResponse(HttpStatusCode.Conflict, "Fixtures already exist for these rounds.");
+                }
+
+                // Shuffle teams for the first round
+                var shuffledTeams = teams.OrderBy(t => Guid.NewGuid()).ToList();
+
+                // Generate fixtures for all rounds
+                foreach (var round in rounds)
+                {
+                    bool isFirstRound = (round == rounds[0]); // Check if it's the first round
+
+                    for (int i = 0; i < round.Matches; i++)
+                    {
+                        Fixture fixture = new Fixture
+                        {
+                            match_type = round.RoundName,
+                            sessionSport_id = sessionSportId,
+                            venue = venue,
+                            matchDate = null,
+                            winner_id = null
+                        };
+
+                        // Assign teams only for the first round
+                        if (isFirstRound)
+                        {
+                            int team1Index = i * 2;
+                            int team2Index = i * 2 + 1;
+
+                            fixture.team1_id = shuffledTeams[team1Index].teamid;
+                            fixture.team2_id = shuffledTeams[team2Index].teamid;
+                        }
+                        else
+                        {
+                            // Subsequent rounds: teams are null initially
+                            fixture.team1_id = null;
+                            fixture.team2_id = null;
+                        }
+
+                        db.Fixtures.Add(fixture);
+                    }
+                }
+
+                db.SaveChanges();
+                return Request.CreateResponse(HttpStatusCode.OK, "All fixtures created successfully.");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        //complete create fixture automattically with 40 time interval of each match
+        [HttpPost]
+        public HttpResponseMessage AutocreateFixtureswithTime(int userid, int sessionSportId, string venue, DateTime initialDateTime)
+        {
+            try
+            {
+                // Validate parameters
+                if (userid < 0)
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid user ID.");
+
+                if (initialDateTime == default(DateTime))
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, "Valid initial date/time required.");
+
+                // Verify session sport management
+                var sessionSport = db.SessionSports.FirstOrDefault(s =>
+                    s.id == sessionSportId &&
+                    s.managed_by == userid);
+
+                if (sessionSport == null)
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "Session sport not found or unauthorized.");
+
+                // Get teams and validate count
+                var teams = db.Teams
+                    .Where(t => t.session_id == sessionSport.session_id &&
+                                t.sport_id == sessionSport.sports_id)
+                    .ToList();
+
+                int teamCount = teams.Count;
+                var validCounts = new[] { 4, 8, 16, 32 };
+                if (!validCounts.Contains(teamCount))
+                    return Request.CreateResponse(HttpStatusCode.BadRequest,
+                        $"Requires {string.Join(", ", validCounts)} teams.");
+
+                // Define tournament structure
+                var rounds = new List<(string Name, int Matches)>();
+                switch (teamCount)
+                {
+                    case 4:
+                        rounds.Add(("Semi Final", 2));
+                        rounds.Add(("Final", 1));
+                        break;
+                    case 8:
+                        rounds.Add(("Quarter Final", 4));
+                        rounds.Add(("Semi Final", 2));
+                        rounds.Add(("Final", 1));
+                        break;
+                    case 16:
+                        rounds.Add(("Round of 16", 8));
+                        rounds.Add(("Quarter Final", 4));
+                        rounds.Add(("Semi Final", 2));
+                        rounds.Add(("Final", 1));
+                        break;
+                    case 32:
+                        rounds.Add(("Round of 32", 16));
+                        rounds.Add(("Round of 16", 8));
+                        rounds.Add(("Quarter Final", 4));
+                        rounds.Add(("Semi Final", 2));
+                        rounds.Add(("Final", 1));
+                        break;
+                }
+
+                // Check existing fixtures
+                if (db.Fixtures.Any(f =>
+                    f.sessionSport_id == sessionSportId &&
+                    rounds.Select(r => r.Name).Contains(f.match_type)))
+                    return Request.CreateResponse(HttpStatusCode.Conflict, "Fixtures already exist.");
+
+                // Prepare team pairings for first round
+                var shuffledTeams = teams.OrderBy(t => Guid.NewGuid()).ToList();
+                DateTime currentTime = initialDateTime;
+
+                // Create all tournament matches
+                foreach (var round in rounds)
+                {
+                    bool isFirstRound = round == rounds[0];
+
+                    for (int i = 0; i < round.Matches; i++)
+                    {
+                        var fixture = new Fixture
+                        {
+                            match_type = round.Name,
+                            sessionSport_id = sessionSportId,
+                            venue = venue,
+                            matchDate = currentTime,
+                            winner_id = null
+                        };
+
+                        // Assign teams only for first round
+                        if (isFirstRound)
+                        {
+                            int team1Index = i * 2;
+                            int team2Index = i * 2 + 1;
+
+                            fixture.team1_id = shuffledTeams[team1Index].teamid;
+                            fixture.team2_id = shuffledTeams[team2Index].teamid;
+                        }
+
+                        db.Fixtures.Add(fixture);
+                        currentTime = currentTime.AddMinutes(40); // Schedule next match
+                    }
+                }
+
+                db.SaveChanges();
+                return Request.CreateResponse(HttpStatusCode.OK,
+                    $"Created {rounds.Sum(r => r.Matches)} fixtures starting from {initialDateTime}");
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

@@ -24,6 +24,7 @@ namespace SportsWeek.Models
             this.FixturesImages = new HashSet<FixturesImage>();
             this.GoalBaseScores = new HashSet<GoalBaseScore>();
             this.ManOfTheMatches = new HashSet<ManOfTheMatch>();
+            this.Notifications = new HashSet<Notification>();
             this.PointsBaseScores = new HashSet<PointsBaseScore>();
             this.scorecards = new HashSet<scorecard>();
             this.TurnBaseGames = new HashSet<TurnBaseGame>();
@@ -55,6 +56,8 @@ namespace SportsWeek.Models
         public virtual ICollection<GoalBaseScore> GoalBaseScores { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ManOfTheMatch> ManOfTheMatches { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Notification> Notifications { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<PointsBaseScore> PointsBaseScores { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
